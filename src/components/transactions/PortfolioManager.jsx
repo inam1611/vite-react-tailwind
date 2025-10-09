@@ -1,0 +1,57 @@
+import React from "react";
+
+const PortfolioManager = ({
+  portfolios,
+  selectedPortfolio,
+  setSelectedPortfolio,
+  newPortfolioName,
+  setNewPortfolioName,
+  handleAddPortfolio,
+  handleDeletePortfolio,
+}) => {
+  return (
+    <div className="bg-white shadow p-6 rounded-lg space-y-4 w-full">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <label className="font-medium text-gray-700">Active Portfolio:</label>
+          <select
+            value={selectedPortfolio}
+            onChange={(e) => setSelectedPortfolio(e.target.value)}
+            className="ml-2 border border-gray-300 rounded-md px-3 py-2 focus:ring focus:ring-indigo-200"
+          >
+            {portfolios.map((p) => (
+              <option key={p}>{p}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex gap-2 flex-wrap items-center">
+          <input
+            type="text"
+            placeholder="New Portfolio Name"
+            value={newPortfolioName}
+            onChange={(e) => setNewPortfolioName(e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2"
+          />
+          <button
+            onClick={handleAddPortfolio}
+            className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+          >
+            Add
+          </button>
+
+          {selectedPortfolio !== "Main Portfolio" && (
+            <button
+              onClick={() => handleDeletePortfolio(selectedPortfolio)}
+              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+            >
+              Delete
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PortfolioManager;

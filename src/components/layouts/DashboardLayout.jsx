@@ -637,11 +637,11 @@ const DashboardLayout = () => {
         {/* Sidebar Top */}
         <div
           className="flex items-center justify-between px-3 border-b"
-          style={{ height: "3rem" }} // 48px, matches header height
+          style={{ height: "3.5rem" }} 
         >
           {!collapsed && (
             <h2 className="text-lg font-semibold text-indigo-600 whitespace-nowrap">
-              My WebApp
+              PSX Tracker
             </h2>
           )}
           <button
