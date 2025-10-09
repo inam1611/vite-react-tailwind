@@ -1,8 +1,10 @@
+// // src/App.js
 // import Login from "./components/auth/login";
 // import Register from "./components/auth/register";
-
 // import Header from "./components/header";
 // import Home from "./components/home";
+// import Main from "./components/main"; // ✅ new import
+// import ProtectedRoute from "./components/ProtectedRoute"; // ✅ new import
 
 // import { AuthProvider } from "./contexts/authContext";
 // import { useRoutes } from "react-router-dom";
@@ -10,7 +12,7 @@
 // function App() {
 //   const routesArray = [
 //     {
-//       path: "*",
+//       path: "/",
 //       element: <Login />,
 //     },
 //     {
@@ -23,10 +25,28 @@
 //     },
 //     {
 //       path: "/home",
-//       element: <Home />,
+//       element: (
+//         <ProtectedRoute>
+//           <Home />
+//         </ProtectedRoute>
+//       ),
+//     },
+//     {
+//       path: "/main",
+//       element: (
+//         <ProtectedRoute>
+//           <Main />
+//         </ProtectedRoute>
+//       ),
+//     },
+//     {
+//       path: "*",
+//       element: <Login />,
 //     },
 //   ];
-//   let routesElement = useRoutes(routesArray);
+
+//   const routesElement = useRoutes(routesArray);
+
 //   return (
 //     <AuthProvider>
 //       <Header />
@@ -37,61 +57,142 @@
 
 // export default App;
 
-// src/App.js
+// import React from "react";
+// import { Navigate, useRoutes } from "react-router-dom";
+// import { AuthProvider, useAuth } from "./contexts/authContext";
+
+// import Login from "./components/auth/login";
+// import Register from "./components/auth/register";
+// import Header from "./components/header";
+// import Home from "./components/home";
+// import Main from "./components/main";
+// import Profile from "./pages/Profile";   // ✅ new import
+// import Settings from "./pages/Settings"; // ✅ new import
+// import ProtectedRoute from "./components/ProtectedRoute";
+
+// // ✅ Smart redirect for root — sends user to correct page
+// const RootRedirect = () => {
+//   const { userLoggedIn } = useAuth();
+//   return userLoggedIn ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />;
+// };
+
+// function AppRoutes() {
+//   const routesArray = [
+//     { path: "/", element: <RootRedirect /> },
+//     { path: "/login", element: <Login /> },
+//     { path: "/register", element: <Register /> },
+
+//     // ✅ Protected routes
+//     {
+//       path: "/home",
+//       element: (
+//         <ProtectedRoute>
+//           <Home />
+//         </ProtectedRoute>
+//       ),
+//     },
+//     {
+//       path: "/main",
+//       element: (
+//         <ProtectedRoute>
+//           <Main />
+//         </ProtectedRoute>
+//       ),
+//     },
+//     {
+//       path: "/profile",
+//       element: (
+//         <ProtectedRoute>
+//           <Profile />
+//         </ProtectedRoute>
+//       ),
+//     },
+//     {
+//       path: "/settings",
+//       element: (
+//         <ProtectedRoute>
+//           <Settings />
+//         </ProtectedRoute>
+//       ),
+//     },
+
+//     // ✅ catch-all fallback
+//     { path: "*", element: <Navigate to="/" replace /> },
+//   ];
+
+//   return useRoutes(routesArray);
+// }
+
+// function App() {
+//   return (
+//     <AuthProvider>
+//       <Header />
+//       <div className="w-full h-screen flex flex-col">
+//         <AppRoutes />
+//       </div>
+//     </AuthProvider>
+//   );
+// }
+
+// export default App;
+
+import React from "react";
+import { Navigate, useRoutes } from "react-router-dom";
+import { AuthProvider, useAuth } from "./contexts/authContext";
+
 import Login from "./components/auth/login";
 import Register from "./components/auth/register";
 import Header from "./components/header";
 import Home from "./components/home";
-import Main from "./components/main"; // ✅ new import
-import ProtectedRoute from "./components/ProtectedRoute"; // ✅ new import
+import Main from "./components/main";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
+import ProtectedRoute from "./components/ProtectedRoute";
+import DashboardLayout from "./components/layouts/DashboardLayout"; // ✅ new import
 
-import { AuthProvider } from "./contexts/authContext";
-import { useRoutes } from "react-router-dom";
+const RootRedirect = () => {
+  const { userLoggedIn } = useAuth();
+  return userLoggedIn ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />;
+};
 
-function App() {
+function AppRoutes() {
   const routesArray = [
+    { path: "/", element: <RootRedirect /> },
+    { path: "/login", element: <Login /> },
+    { path: "/register", element: <Register /> },
+
+    // ✅ Protected routes with DashboardLayout
     {
       path: "/",
-      element: <Login />,
-    },
-    {
-      path: "/login",
-      element: <Login />,
-    },
-    {
-      path: "/register",
-      element: <Register />,
-    },
-    {
-      path: "/home",
       element: (
         <ProtectedRoute>
-          <Home />
+          <DashboardLayout />
         </ProtectedRoute>
       ),
+      children: [
+        { path: "home", element: <Home /> },
+        { path: "main", element: <Main /> },
+        { path: "profile", element: <Profile /> },
+        { path: "settings", element: <Settings /> },
+      ],
     },
-    {
-      path: "/main",
-      element: (
-        <ProtectedRoute>
-          <Main />
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: "*",
-      element: <Login />,
-    },
+
+    { path: "*", element: <Navigate to="/" replace /> },
   ];
 
-  const routesElement = useRoutes(routesArray);
+  return useRoutes(routesArray);
+}
 
+function App() {
   return (
     <AuthProvider>
-      <Header />
-      <div className="w-full h-screen flex flex-col">{routesElement}</div>
+      <div className="w-full h-screen flex flex-col">
+        <AppRoutes />
+      </div>
     </AuthProvider>
   );
 }
 
 export default App;
+
+
