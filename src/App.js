@@ -136,6 +136,66 @@
 
 // export default App;
 
+// import React from "react";
+// import { Navigate, useRoutes } from "react-router-dom";
+// import { AuthProvider, useAuth } from "./contexts/authContext";
+
+// import Login from "./components/auth/login";
+// import Register from "./components/auth/register";
+// import Header from "./components/header";
+// import Home from "./components/home";
+// import Main from "./components/transactions/Transactions";
+// import Profile from "./pages/Profile";
+// import Settings from "./pages/Settings";
+// import ProtectedRoute from "./components/ProtectedRoute";
+// import DashboardLayout from "./components/layouts/DashboardLayout"; // ✅ new import
+
+// const RootRedirect = () => {
+//   const { userLoggedIn } = useAuth();
+//   return userLoggedIn ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />;
+// };
+
+// function AppRoutes() {
+//   const routesArray = [
+//     { path: "/", element: <RootRedirect /> },
+//     { path: "/login", element: <Login /> },
+//     { path: "/register", element: <Register /> },
+
+//     // ✅ Protected routes with DashboardLayout
+//     {
+//       path: "/",
+//       element: (
+//         <ProtectedRoute>
+//           <DashboardLayout />
+//         </ProtectedRoute>
+//       ),
+//       children: [
+//         { path: "home", element: <Home /> },
+//         { path: "main", element: <Main /> },
+//         { path: "profile", element: <Profile /> },
+//         { path: "settings", element: <Settings /> },
+//       ],
+//     },
+
+//     { path: "*", element: <Navigate to="/" replace /> },
+//   ];
+
+//   return useRoutes(routesArray);
+// }
+
+// function App() {
+//   return (
+//     <AuthProvider>
+//       <div className="w-full h-screen flex flex-col">
+//         <AppRoutes />
+//       </div>
+//     </AuthProvider>
+//   );
+// }
+
+// export default App;
+
+
 import React from "react";
 import { Navigate, useRoutes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/authContext";
@@ -144,7 +204,7 @@ import Login from "./components/auth/login";
 import Register from "./components/auth/register";
 import Header from "./components/header";
 import Home from "./components/home";
-import Main from "./components/main";
+import Transactions from "./components/transactions/Transactions"; // ✅ renamed
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -171,7 +231,7 @@ function AppRoutes() {
       ),
       children: [
         { path: "home", element: <Home /> },
-        { path: "main", element: <Main /> },
+        { path: "transactions", element: <Transactions /> }, // ✅ replaced main
         { path: "profile", element: <Profile /> },
         { path: "settings", element: <Settings /> },
       ],
@@ -194,5 +254,3 @@ function App() {
 }
 
 export default App;
-
-

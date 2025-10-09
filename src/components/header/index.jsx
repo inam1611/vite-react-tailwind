@@ -414,6 +414,109 @@
 
 // export default Header;
 
+// import React, { useState, useRef, useEffect } from "react";
+// import { Link, useNavigate } from "react-router-dom";
+// import { useAuth } from "../../contexts/authContext";
+// import { doSignOut } from "../../firebase/auth";
+
+// const Header = ({ sidebarWidth = 64 }) => {
+//   const navigate = useNavigate();
+//   const { userLoggedIn, currentUser } = useAuth();
+//   const [menuOpen, setMenuOpen] = useState(false);
+//   const dropdownRef = useRef(null);
+
+//   // Close dropdown when clicking outside
+//   useEffect(() => {
+//     const handleClickOutside = (event) => {
+//       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+//         setMenuOpen(false);
+//       }
+//     };
+//     document.addEventListener("mousedown", handleClickOutside);
+//     return () => document.removeEventListener("mousedown", handleClickOutside);
+//   }, []);
+
+//   const handleLogout = () => {
+//     doSignOut().then(() => navigate("/login"));
+//   };
+
+//   return (
+//     <nav
+//       className="flex items-center justify-between fixed top-0 h-12 px-4 md:px-6 border-b bg-gray-200 z-20 shadow-sm transition-all duration-300"
+//       style={{ left: sidebarWidth, width: `calc(100% - ${sidebarWidth}px)` }}
+//     >
+//       {/* Left: App Title */}
+//       <div
+//         className="text-lg font-semibold text-gray-800 tracking-wide select-none cursor-pointer"
+//         onClick={() => navigate(userLoggedIn ? "/home" : "/")}
+//       >
+//         My WebApp
+//       </div>
+
+//       {/* Right: User Menu or Auth Buttons */}
+//       <div className="relative" ref={dropdownRef}>
+//         {userLoggedIn ? (
+//           <>
+//             {/* Avatar */}
+//             <button
+//               onClick={() => setMenuOpen((prev) => !prev)}
+//               className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center hover:bg-indigo-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+//               aria-label="User menu"
+//             >
+//               {currentUser?.email?.[0]?.toUpperCase() || "U"}
+//             </button>
+
+//             {/* Dropdown */}
+//             <div
+//               className={`absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border py-2 transform transition-all duration-200 origin-top-right ${
+//                 menuOpen ? "scale-100 opacity-100 visible" : "scale-95 opacity-0 invisible"
+//               }`}
+//             >
+//               <Link
+//                 to="/profile"
+//                 onClick={() => setMenuOpen(false)}
+//                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+//               >
+//                 Profile
+//               </Link>
+//               <Link
+//                 to="/settings"
+//                 onClick={() => setMenuOpen(false)}
+//                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+//               >
+//                 Settings
+//               </Link>
+//               <button
+//                 onClick={handleLogout}
+//                 className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 transition"
+//               >
+//                 Logout
+//               </button>
+//             </div>
+//           </>
+//         ) : (
+//           <div className="flex items-center gap-x-3">
+//             <Link
+//               to="/login"
+//               className="px-4 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition duration-300"
+//             >
+//               Login
+//             </Link>
+//             <Link
+//               to="/register"
+//               className="px-4 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition duration-300"
+//             >
+//               Register
+//             </Link>
+//           </div>
+//         )}
+//       </div>
+//     </nav>
+//   );
+// };
+
+// export default Header;
+
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/authContext";
@@ -442,53 +545,60 @@ const Header = ({ sidebarWidth = 64 }) => {
 
   return (
     <nav
-      className="flex items-center justify-between fixed top-0 h-12 px-4 md:px-6 border-b bg-gray-200 z-20 shadow-sm transition-all duration-300"
-      style={{ left: sidebarWidth, width: `calc(100% - ${sidebarWidth}px)` }}
+      className="flex items-center justify-between fixed top-0 h-14 px-5 md:px-8 z-20 border-b 
+                 bg-white/70 backdrop-blur-lg shadow-sm transition-all duration-300"
+      style={{
+        left: sidebarWidth,
+        width: `calc(100% - ${sidebarWidth}px)`,
+      }}
     >
-      {/* Left: App Title */}
+      {/* ===== Left: Brand Title ===== */}
       <div
-        className="text-lg font-semibold text-gray-800 tracking-wide select-none cursor-pointer"
         onClick={() => navigate(userLoggedIn ? "/home" : "/")}
+        className="text-xl font-semibold text-indigo-700 tracking-wide cursor-pointer select-none 
+                   hover:text-indigo-800 transition-colors duration-300"
       >
-        My WebApp
+        PSX Tracker
       </div>
 
-      {/* Right: User Menu or Auth Buttons */}
+      {/* ===== Right: User Menu / Auth Buttons ===== */}
       <div className="relative" ref={dropdownRef}>
         {userLoggedIn ? (
           <>
-            {/* Avatar */}
+            {/* Avatar Button */}
             <button
               onClick={() => setMenuOpen((prev) => !prev)}
-              className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center hover:bg-indigo-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              aria-label="User menu"
+              className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 
+                         text-white font-semibold flex items-center justify-center 
+                         hover:shadow-md hover:from-indigo-600 hover:to-indigo-800 
+                         transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
             >
               {currentUser?.email?.[0]?.toUpperCase() || "U"}
             </button>
 
             {/* Dropdown */}
             <div
-              className={`absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border py-2 transform transition-all duration-200 origin-top-right ${
-                menuOpen ? "scale-100 opacity-100 visible" : "scale-95 opacity-0 invisible"
-              }`}
+              className={`absolute right-0 mt-3 w-44 bg-white rounded-xl shadow-xl border border-gray-100 
+                          py-2 transition-all duration-200 origin-top-right 
+                          ${menuOpen ? "scale-100 opacity-100 visible" : "scale-95 opacity-0 invisible"}`}
             >
               <Link
                 to="/profile"
                 onClick={() => setMenuOpen(false)}
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                className="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition rounded-md"
               >
                 Profile
               </Link>
               <Link
                 to="/settings"
                 onClick={() => setMenuOpen(false)}
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
+                className="block px-4 py-2 text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition rounded-md"
               >
                 Settings
               </Link>
               <button
                 onClick={handleLogout}
-                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 transition"
+                className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition rounded-md"
               >
                 Logout
               </button>
@@ -498,13 +608,15 @@ const Header = ({ sidebarWidth = 64 }) => {
           <div className="flex items-center gap-x-3">
             <Link
               to="/login"
-              className="px-4 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition duration-300"
+              className="px-4 py-1.5 text-sm font-medium text-white bg-gradient-to-r from-indigo-500 to-indigo-600 
+                         rounded-lg hover:from-indigo-600 hover:to-indigo-700 shadow-sm transition-all duration-300"
             >
               Login
             </Link>
             <Link
               to="/register"
-              className="px-4 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition duration-300"
+              className="px-4 py-1.5 text-sm font-medium text-indigo-600 border border-indigo-500 
+                         rounded-lg hover:bg-indigo-50 transition-all duration-300"
             >
               Register
             </Link>
