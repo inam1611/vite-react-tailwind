@@ -62,11 +62,13 @@ import React from "react";
 const TransactionForm = ({ newTransaction, setNewTransaction, handleAddTransaction }) => {
   const handlePriceChange = (e) => {
     const value = e.target.value;
-    const floatVal = parseFloat(value);
-    setNewTransaction({
-      ...newTransaction,
-      price: isNaN(floatVal) ? "" : floatVal.toFixed(2), // format to 2 decimals
-    });
+    // Only allow numbers and decimal points
+    if (/^\d*\.?\d*$/.test(value)) {
+      setNewTransaction({
+        ...newTransaction,
+        price: value,
+      });
+    }
   };
 
   return (
@@ -104,8 +106,7 @@ const TransactionForm = ({ newTransaction, setNewTransaction, handleAddTransacti
           className="border border-gray-300 rounded-md px-3 py-2"
         />
         <input
-          type="number"
-          step="0.01"
+          type="text"
           placeholder="Price"
           value={newTransaction.price}
           onChange={handlePriceChange}
