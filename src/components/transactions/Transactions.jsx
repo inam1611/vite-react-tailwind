@@ -1253,11 +1253,12 @@ const Transactions = () => {
   const [newPortfolioName, setNewPortfolioName] = useState("");
 
   if (loading)
-    return (
-      <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] text-gray-700 text-lg bg-gray-100">
-        Loading your portfolios...
-      </div>
-    );
+  return (
+    <div className="flex justify-center items-center min-h-[calc(100vh-4rem)]">
+      <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+
 
   if (!user)
     return (
