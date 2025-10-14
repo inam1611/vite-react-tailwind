@@ -203,7 +203,7 @@ import { AuthProvider, useAuth } from "./contexts/authContext";
 import Login from "./components/auth/login";
 import Register from "./components/auth/register";
 import Header from "./components/header";
-import Home from "./components/home";
+import Home from "./components/home/Home";
 import Transactions from "./components/transactions/Transactions"; // ✅ renamed
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
