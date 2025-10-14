@@ -773,14 +773,216 @@
 
 // export default Transactions;
 
-import React, { useState, useEffect } from "react";
+// import React, { useState, useEffect } from "react";
+// import toast, { Toaster } from "react-hot-toast";
+// import TransactionForm from "./TransactionForm";
+// import TransactionTable from "./TransactionTable";
+// import PortfolioManager from "./PortfolioManager";
+// import { db, auth } from "../../firebase/firebase";
+// import { doc, getDoc, setDoc } from "firebase/firestore";
+// import { onAuthStateChanged } from "firebase/auth";
+
+// const Transactions = () => {
+//   const [portfolios, setPortfolios] = useState(["Main Portfolio"]);
+//   const [selectedPortfolio, setSelectedPortfolio] = useState("Main Portfolio");
+//   const [transactions, setTransactions] = useState([]);
+//   const [newTransaction, setNewTransaction] = useState({
+//     symbol: "",
+//     type: "buy",
+//     quantity: "",
+//     price: "",
+//     date: "",
+//   });
+//   const [newPortfolioName, setNewPortfolioName] = useState("");
+//   const [user, setUser] = useState(null);
+//   const [loading, setLoading] = useState(true);
+
+//   // 🔹 Listen for Firebase Auth changes
+//   useEffect(() => {
+//     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+//       if (currentUser) {
+//         setUser(currentUser);
+//         setLoading(true);
+
+//         try {
+//           const userDocRef = doc(db, "users", currentUser.uid);
+//           const userDoc = await getDoc(userDocRef);
+
+//           if (userDoc.exists()) {
+//             const data = userDoc.data();
+//             setPortfolios(data.portfolios || ["Main Portfolio"]);
+//             setTransactions(data.transactions || []);
+//             setSelectedPortfolio(data.selectedPortfolio || "Main Portfolio");
+//             console.log("✅ Loaded from Firestore:", data);
+//           } else {
+//             // 🆕 First-time user — create base document
+//             await setDoc(userDocRef, {
+//               portfolios: ["Main Portfolio"],
+//               selectedPortfolio: "Main Portfolio",
+//               transactions: [],
+//             });
+//             console.log("🆕 Created new Firestore document");
+//           }
+//         } catch (err) {
+//           console.error("Error loading user data:", err);
+//           toast.error("Failed to load data from Firestore.");
+//         } finally {
+//           setLoading(false);
+//         }
+//       } else {
+//         setUser(null);
+//         setLoading(false);
+//       }
+//     });
+
+//     return () => unsubscribe();
+//   }, []);
+
+//   // 🔹 Save to Firestore when state changes
+//   useEffect(() => {
+//     if (!user || loading) return; // avoid saving before data loads
+
+//     const saveData = async () => {
+//       try {
+//         const userDocRef = doc(db, "users", user.uid);
+//         await setDoc(userDocRef, {
+//           portfolios,
+//           selectedPortfolio,
+//           transactions,
+//         });
+//         console.log("💾 Synced data to Firestore");
+//       } catch (err) {
+//         console.error("Error saving data:", err);
+//         toast.error("Failed to sync data with Firestore.");
+//       }
+//     };
+
+//     saveData();
+//   }, [portfolios, selectedPortfolio, transactions, user, loading]);
+
+//   // === Portfolio Management ===
+//   const handleAddPortfolio = () => {
+//     if (newPortfolioName && !portfolios.includes(newPortfolioName)) {
+//       setPortfolios([...portfolios, newPortfolioName]);
+//       setSelectedPortfolio(newPortfolioName);
+//       setNewPortfolioName("");
+//       toast.success("Portfolio added!");
+//     } else {
+//       toast.error("Portfolio already exists or invalid name!");
+//     }
+//   };
+
+//   const handleDeletePortfolio = (name) => {
+//     if (name === "Main Portfolio") {
+//       toast.error("You cannot delete the default portfolio.");
+//       return;
+//     }
+//     if (window.confirm(`Delete portfolio "${name}" and all its transactions?`)) {
+//       setPortfolios(portfolios.filter((p) => p !== name));
+//       setTransactions(transactions.filter((tx) => tx.portfolio !== name));
+//       if (selectedPortfolio === name) setSelectedPortfolio("Main Portfolio");
+//       toast.success("Portfolio deleted.");
+//     }
+//   };
+
+//   // === Transaction Management ===
+//   const handleAddTransaction = (e) => {
+//     e.preventDefault();
+//     if (!newTransaction.symbol || !newTransaction.quantity || !newTransaction.price) {
+//       toast.error("Please fill in all required fields!");
+//       return;
+//     }
+
+//     const tx = { ...newTransaction, id: Date.now(), portfolio: selectedPortfolio };
+//     setTransactions([...transactions, tx]);
+//     setNewTransaction({ symbol: "", type: "buy", quantity: "", price: "", date: "" });
+//     toast.success("Transaction added!");
+//   };
+
+//   const handleDeleteTransaction = (id) => {
+//     if (window.confirm("Are you sure you want to delete this transaction?")) {
+//       setTransactions(transactions.filter((tx) => tx.id !== id));
+//       toast.success("Transaction deleted.");
+//     }
+//   };
+
+//   const filteredTransactions = transactions.filter(
+//     (tx) => tx.portfolio === selectedPortfolio
+//   );
+
+//   const totalValue = filteredTransactions.reduce((sum, tx) => {
+//     const value =
+//       tx.type === "buy"
+//         ? tx.quantity * tx.price
+//         : tx.type === "sell"
+//         ? -tx.quantity * tx.price
+//         : 0;
+//     return sum + value;
+//   }, 0);
+
+//   if (loading)
+//     return (
+//       <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] bg-gray-100 text-gray-700 text-lg">
+//         Loading your portfolios...
+//       </div>
+//     );
+
+//   if (!user)
+//     return (
+//       <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] bg-gray-100 text-gray-700 text-lg">
+//         Please log in to view your transactions.
+//       </div>
+//     );
+
+//   return (
+//     <div className="min-h-[calc(100vh-4rem)] bg-gray-100 p-8 overflow-y-auto transition-all duration-300">
+//       <Toaster position="top-right" />
+
+//       <div className="space-y-8">
+//         <h1 className="text-3xl font-bold text-gray-800">Transactions</h1>
+
+//         {/* === Portfolio Section === */}
+//         <PortfolioManager
+//           portfolios={portfolios}
+//           selectedPortfolio={selectedPortfolio}
+//           setSelectedPortfolio={setSelectedPortfolio}
+//           newPortfolioName={newPortfolioName}
+//           setNewPortfolioName={setNewPortfolioName}
+//           handleAddPortfolio={handleAddPortfolio}
+//           handleDeletePortfolio={handleDeletePortfolio}
+//         />
+
+//         {/* === Add Transaction Form === */}
+//         <TransactionForm
+//           newTransaction={newTransaction}
+//           setNewTransaction={setNewTransaction}
+//           handleAddTransaction={handleAddTransaction}
+//         />
+
+//         {/* === Transactions Table === */}
+//         <TransactionTable
+//           filteredTransactions={filteredTransactions}
+//           handleDeleteTransaction={handleDeleteTransaction}
+//           totalValue={totalValue}
+//         />
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Transactions;
+
+import React, { useState, useEffect, useRef } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import TransactionForm from "./TransactionForm";
 import TransactionTable from "./TransactionTable";
 import PortfolioManager from "./PortfolioManager";
 import { db, auth } from "../../firebase/firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+
+// 🔹 Global in-memory cache
+let inMemoryCache = null;
 
 const Transactions = () => {
   const [portfolios, setPortfolios] = useState(["Main Portfolio"]);
@@ -796,41 +998,92 @@ const Transactions = () => {
   const [newPortfolioName, setNewPortfolioName] = useState("");
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const isFirstLoad = useRef(true);
 
-  // 🔹 Listen for Firebase Auth changes
+  // ✅ Load from in-memory cache or localStorage instantly
+  useEffect(() => {
+    if (inMemoryCache) {
+      const data = inMemoryCache;
+      setPortfolios(data.portfolios);
+      setTransactions(data.transactions);
+      setSelectedPortfolio(data.selectedPortfolio);
+      setLoading(false);
+      console.log("⚡ Loaded from in-memory cache");
+      return;
+    }
+
+    const cached = localStorage.getItem("cachedTransactionsData");
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      setPortfolios(parsed.portfolios || ["Main Portfolio"]);
+      setTransactions(parsed.transactions || []);
+      setSelectedPortfolio(parsed.selectedPortfolio || "Main Portfolio");
+      console.log("⚡ Loaded from localStorage");
+    }
+  }, []);
+
+  // ✅ Auth listener and Firestore sync
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        setLoading(true);
+      if (!currentUser) {
+        console.log("👋 User logged out, clearing cache...");
 
-        try {
-          const userDocRef = doc(db, "users", currentUser.uid);
-          const userDoc = await getDoc(userDocRef);
+        // 🔥 Clear cache when logged out
+        inMemoryCache = null;
+        localStorage.removeItem("cachedTransactionsData");
 
-          if (userDoc.exists()) {
-            const data = userDoc.data();
-            setPortfolios(data.portfolios || ["Main Portfolio"]);
-            setTransactions(data.transactions || []);
-            setSelectedPortfolio(data.selectedPortfolio || "Main Portfolio");
-            console.log("✅ Loaded from Firestore:", data);
-          } else {
-            // 🆕 First-time user — create base document
-            await setDoc(userDocRef, {
-              portfolios: ["Main Portfolio"],
-              selectedPortfolio: "Main Portfolio",
-              transactions: [],
-            });
-            console.log("🆕 Created new Firestore document");
-          }
-        } catch (err) {
-          console.error("Error loading user data:", err);
-          toast.error("Failed to load data from Firestore.");
-        } finally {
-          setLoading(false);
-        }
-      } else {
         setUser(null);
+        setPortfolios(["Main Portfolio"]);
+        setSelectedPortfolio("Main Portfolio");
+        setTransactions([]);
+        setLoading(false);
+        return;
+      }
+
+      setUser(currentUser);
+
+      if (inMemoryCache && !isFirstLoad.current) {
+        setLoading(false);
+        return;
+      }
+
+      isFirstLoad.current = false;
+      setLoading(true);
+
+      try {
+        const userDocRef = doc(db, "users", currentUser.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          setPortfolios(data.portfolios || ["Main Portfolio"]);
+          setTransactions(data.transactions || []);
+          setSelectedPortfolio(data.selectedPortfolio || "Main Portfolio");
+
+          // 🧠 Cache locally + in memory
+          inMemoryCache = data;
+          localStorage.setItem("cachedTransactionsData", JSON.stringify(data));
+
+          console.log("✅ Loaded from Firestore");
+        } else {
+          // 🆕 New user
+          const defaultData = {
+            portfolios: ["Main Portfolio"],
+            selectedPortfolio: "Main Portfolio",
+            transactions: [],
+            lastUpdated: serverTimestamp(),
+          };
+          await setDoc(userDocRef, defaultData);
+
+          inMemoryCache = defaultData;
+          localStorage.setItem("cachedTransactionsData", JSON.stringify(defaultData));
+
+          console.log("🆕 Created new Firestore doc");
+        }
+      } catch (err) {
+        console.error("❌ Error loading data:", err);
+        toast.error("Failed to load data.");
+      } finally {
         setLoading(false);
       }
     });
@@ -838,49 +1091,49 @@ const Transactions = () => {
     return () => unsubscribe();
   }, []);
 
-  // 🔹 Save to Firestore when state changes
-  useEffect(() => {
-    if (!user || loading) return; // avoid saving before data loads
+  // === Firestore Sync + Cache Update ===
+  const syncToFirestore = async (updatedData) => {
+    if (!user) return;
+    try {
+      const userDocRef = doc(db, "users", user.uid);
+      await setDoc(userDocRef, { ...updatedData, lastUpdated: serverTimestamp() });
 
-    const saveData = async () => {
-      try {
-        const userDocRef = doc(db, "users", user.uid);
-        await setDoc(userDocRef, {
-          portfolios,
-          selectedPortfolio,
-          transactions,
-        });
-        console.log("💾 Synced data to Firestore");
-      } catch (err) {
-        console.error("Error saving data:", err);
-        toast.error("Failed to sync data with Firestore.");
-      }
-    };
-
-    saveData();
-  }, [portfolios, selectedPortfolio, transactions, user, loading]);
+      inMemoryCache = updatedData;
+      localStorage.setItem("cachedTransactionsData", JSON.stringify(updatedData));
+      console.log("💾 Synced with Firestore + updated cache");
+    } catch (err) {
+      console.error("Error syncing:", err);
+      toast.error("Failed to sync data.");
+    }
+  };
 
   // === Portfolio Management ===
   const handleAddPortfolio = () => {
     if (newPortfolioName && !portfolios.includes(newPortfolioName)) {
-      setPortfolios([...portfolios, newPortfolioName]);
+      const updatedPortfolios = [...portfolios, newPortfolioName];
+      const updatedData = { portfolios: updatedPortfolios, selectedPortfolio: newPortfolioName, transactions };
+      setPortfolios(updatedPortfolios);
       setSelectedPortfolio(newPortfolioName);
       setNewPortfolioName("");
+      syncToFirestore(updatedData);
       toast.success("Portfolio added!");
-    } else {
-      toast.error("Portfolio already exists or invalid name!");
-    }
+    } else toast.error("Portfolio already exists or invalid name!");
   };
 
   const handleDeletePortfolio = (name) => {
-    if (name === "Main Portfolio") {
-      toast.error("You cannot delete the default portfolio.");
-      return;
-    }
-    if (window.confirm(`Delete portfolio "${name}" and all its transactions?`)) {
-      setPortfolios(portfolios.filter((p) => p !== name));
-      setTransactions(transactions.filter((tx) => tx.portfolio !== name));
-      if (selectedPortfolio === name) setSelectedPortfolio("Main Portfolio");
+    if (name === "Main Portfolio") return toast.error("Cannot delete default portfolio.");
+    if (window.confirm(`Delete "${name}" and all its transactions?`)) {
+      const updatedPortfolios = portfolios.filter((p) => p !== name);
+      const updatedTransactions = transactions.filter((tx) => tx.portfolio !== name);
+      const updatedData = {
+        portfolios: updatedPortfolios,
+        selectedPortfolio: selectedPortfolio === name ? "Main Portfolio" : selectedPortfolio,
+        transactions: updatedTransactions,
+      };
+      setPortfolios(updatedPortfolios);
+      setTransactions(updatedTransactions);
+      setSelectedPortfolio(updatedData.selectedPortfolio);
+      syncToFirestore(updatedData);
       toast.success("Portfolio deleted.");
     }
   };
@@ -888,48 +1141,46 @@ const Transactions = () => {
   // === Transaction Management ===
   const handleAddTransaction = (e) => {
     e.preventDefault();
-    if (!newTransaction.symbol || !newTransaction.quantity || !newTransaction.price) {
-      toast.error("Please fill in all required fields!");
-      return;
-    }
+    if (!newTransaction.symbol || !newTransaction.quantity || !newTransaction.price)
+      return toast.error("Please fill all fields!");
 
     const tx = { ...newTransaction, id: Date.now(), portfolio: selectedPortfolio };
-    setTransactions([...transactions, tx]);
+    const updatedTransactions = [...transactions, tx];
+    const updatedData = { portfolios, selectedPortfolio, transactions: updatedTransactions };
+    setTransactions(updatedTransactions);
     setNewTransaction({ symbol: "", type: "buy", quantity: "", price: "", date: "" });
+    syncToFirestore(updatedData);
     toast.success("Transaction added!");
   };
 
   const handleDeleteTransaction = (id) => {
     if (window.confirm("Are you sure you want to delete this transaction?")) {
-      setTransactions(transactions.filter((tx) => tx.id !== id));
-      toast.success("Transaction deleted.");
+      const updatedTransactions = transactions.filter((tx) => tx.id !== id);
+      const updatedData = { portfolios, selectedPortfolio, transactions: updatedTransactions };
+      setTransactions(updatedTransactions);
+      syncToFirestore(updatedData);
+      toast.success("Transaction deleted!");
     }
   };
 
-  const filteredTransactions = transactions.filter(
-    (tx) => tx.portfolio === selectedPortfolio
-  );
-
+  // === Derived Values ===
+  const filteredTransactions = transactions.filter((tx) => tx.portfolio === selectedPortfolio);
   const totalValue = filteredTransactions.reduce((sum, tx) => {
-    const value =
-      tx.type === "buy"
-        ? tx.quantity * tx.price
-        : tx.type === "sell"
-        ? -tx.quantity * tx.price
-        : 0;
+    const value = tx.type === "buy" ? tx.quantity * tx.price : -tx.quantity * tx.price;
     return sum + value;
   }, 0);
 
+  // === UI ===
   if (loading)
     return (
-      <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] bg-gray-100 text-gray-700 text-lg">
+      <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] text-gray-700 text-lg bg-gray-100">
         Loading your portfolios...
       </div>
     );
 
   if (!user)
     return (
-      <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] bg-gray-100 text-gray-700 text-lg">
+      <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] text-gray-700 text-lg bg-gray-100">
         Please log in to view your transactions.
       </div>
     );
@@ -937,11 +1188,9 @@ const Transactions = () => {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-100 p-8 overflow-y-auto transition-all duration-300">
       <Toaster position="top-right" />
-
       <div className="space-y-8">
         <h1 className="text-3xl font-bold text-gray-800">Transactions</h1>
 
-        {/* === Portfolio Section === */}
         <PortfolioManager
           portfolios={portfolios}
           selectedPortfolio={selectedPortfolio}
@@ -952,14 +1201,12 @@ const Transactions = () => {
           handleDeletePortfolio={handleDeletePortfolio}
         />
 
-        {/* === Add Transaction Form === */}
         <TransactionForm
           newTransaction={newTransaction}
           setNewTransaction={setNewTransaction}
           handleAddTransaction={handleAddTransaction}
         />
 
-        {/* === Transactions Table === */}
         <TransactionTable
           filteredTransactions={filteredTransactions}
           handleDeleteTransaction={handleDeleteTransaction}
