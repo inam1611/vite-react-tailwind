@@ -103,7 +103,7 @@ import {
 
 const DashboardLayout = () => {
   const [collapsed, setCollapsed] = useState(false); // Sidebar collapse state
-  const sidebarWidth = collapsed ? 64 : 190; // px values (Tailwind equivalents)
+  const sidebarWidth = collapsed ? 70 : 190; // px values (Tailwind equivalents)
 
   const navItems = [
     { path: "/home", icon: <HomeIcon className="w-5 h-5" />, label: "Home" },

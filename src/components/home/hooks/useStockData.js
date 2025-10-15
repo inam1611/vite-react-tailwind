@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 
-export default function useStockData(holdings, refreshInterval = 60000) {
+const REFRESH_INTERVAL = 5 * 60 * 1000; // 3 minutes in milliseconds
+export default function useStockData(holdings, refreshInterval = REFRESH_INTERVAL)
+ {
   const [stockData, setStockData] = useState({});
   const [lastUpdated, setLastUpdated] = useState(null);
 
