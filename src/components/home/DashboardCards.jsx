@@ -1127,6 +1127,111 @@
 
 // export default DashboardCards;
 
+// import React from "react";
+// import { TrendingUp, TrendingDown, DollarSign, Banknote } from "lucide-react";
+
+// const DashboardCards = ({ summary = {} }) => {
+//   const {
+//     totalInvested = 0,
+//     totalValue = 0,
+//     gainLoss = 0,
+//     returnPercent = 0,
+//     todayPerf = 0,
+//     todayReturn = 0,
+//     realizedGain = 0,
+//     realizedReturn = 0,
+//     totalDividends = 0,
+//   } = summary;
+
+//   const cards = [
+//     {
+//       title: "Total Invested",
+//       value: `Rs. ${totalInvested.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+//       subtitle: "Total Value",
+//       subtitleValue: `Rs. ${totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+//       icon: <DollarSign className="text-indigo-600" />,
+//     },
+//     {
+//       title: "Unrealized Gain/Loss",
+//       value: `Rs. ${gainLoss >= 0 ? "+" : "-"}${Math.abs(gainLoss).toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+//       icon: gainLoss >= 0 ? <TrendingUp className="text-green-600" /> : <TrendingDown className="text-red-600" />,
+//       returnPct: returnPercent,
+//     },
+//     {
+//       title: "Realized Gain/Loss",
+//       value: `Rs. ${realizedGain >= 0 ? "+" : "-"}${Math.abs(realizedGain).toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+//       icon: <Banknote className={`${realizedGain >= 0 ? "text-green-600" : "text-red-600"}`} />,
+//       returnPct: realizedReturn,
+//     },
+//     {
+//       title: "Total Dividends",
+//       value: `Rs. ${totalDividends.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+//       icon: <Banknote className="text-amber-600" />,
+//       // no returnPct
+//     },
+//     {
+//       title: "Today's Performance",
+//       value: `Rs. ${todayPerf >= 0 ? "+" : "-"}${Math.abs(todayPerf).toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+//       icon: todayReturn >= 0 ? <TrendingUp className="text-green-600" /> : <TrendingDown className="text-red-600" />,
+//       returnPct: todayReturn,
+//     },
+//   ];
+
+//   return (
+//     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
+//       {cards.map((c, idx) => {
+//         // Determine value color
+//         const valueNumber = parseFloat(c.value.replace(/[^0-9.-]+/g, ""));
+//         const valueColor =
+//           c.title === "Unrealized Gain/Loss" ||
+//           c.title === "Realized Gain/Loss" ||
+//           c.title === "Today's Performance"
+//             ? valueNumber >= 0
+//               ? "text-green-600"
+//               : "text-red-600"
+//             : "text-indigo-700";
+
+//         return (
+//           <div
+//             key={idx}
+//             className="bg-white shadow rounded-xl p-4 flex flex-col justify-between transition-transform duration-200 hover:scale-[1.02]"
+//           >
+//             {/* Header */}
+//             <div className="flex justify-between items-center">
+//               <h3 className="text-gray-600 font-medium text-sm">{c.title}</h3>
+//               {c.icon}
+//             </div>
+
+//             {/* Value */}
+//             <p className={`text-2xl font-bold mt-1 ${valueColor}`}>{c.value}</p>
+
+//             {/* Optional Subtitle */}
+//             {c.subtitle && (
+//               <div className="mt-1">
+//                 <p className="text-xs text-gray-500">{c.subtitle}</p>
+//                 <p className="text-sm font-semibold text-green-600">{c.subtitleValue}</p>
+//               </div>
+//             )}
+
+//             {/* Optional Return % (not for dividends) */}
+//             {c.returnPct !== undefined && (
+//               <div className="mt-2 flex justify-between text-xs text-gray-500">
+//                 <span>Return</span>
+//                 <span className={`font-semibold ${c.returnPct >= 0 ? "text-green-600" : "text-red-600"}`}>
+//                   {c.returnPct > 0 ? "+" : ""}
+//                   {c.returnPct.toFixed(2)}%
+//                 </span>
+//               </div>
+//             )}
+//           </div>
+//         );
+//       })}
+//     </div>
+//   );
+// };
+
+// export default DashboardCards;
+
 import React from "react";
 import { TrendingUp, TrendingDown, DollarSign, Banknote } from "lucide-react";
 
@@ -1167,7 +1272,6 @@ const DashboardCards = ({ summary = {} }) => {
       title: "Total Dividends",
       value: `Rs. ${totalDividends.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
       icon: <Banknote className="text-amber-600" />,
-      // no returnPct
     },
     {
       title: "Today's Performance",
@@ -1180,7 +1284,6 @@ const DashboardCards = ({ summary = {} }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
       {cards.map((c, idx) => {
-        // Determine value color
         const valueNumber = parseFloat(c.value.replace(/[^0-9.-]+/g, ""));
         const valueColor =
           c.title === "Unrealized Gain/Loss" ||
@@ -1194,7 +1297,7 @@ const DashboardCards = ({ summary = {} }) => {
         return (
           <div
             key={idx}
-            className="bg-white shadow rounded-xl p-4 flex flex-col justify-between transition-transform duration-200 hover:scale-[1.02]"
+            className="bg-white shadow rounded-xl p-4 flex flex-col justify-between transition-transform duration-200 hover:scale-[1.02] border-t border-indigo-300"
           >
             {/* Header */}
             <div className="flex justify-between items-center">
@@ -1213,7 +1316,7 @@ const DashboardCards = ({ summary = {} }) => {
               </div>
             )}
 
-            {/* Optional Return % (not for dividends) */}
+            {/* Optional Return % */}
             {c.returnPct !== undefined && (
               <div className="mt-2 flex justify-between text-xs text-gray-500">
                 <span>Return</span>

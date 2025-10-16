@@ -1166,11 +1166,13 @@ const HistorySummary = ({
     });
 
     // Compute realized return % based on totalInvested
-    const realizedReturn = totalInvested > 0 ? (totalGain / totalInvested) * 100 : 0;
+    const realizedReturn =
+      totalInvested > 0 ? (totalGain / totalInvested) * 100 : 0;
 
     return {
       history: monthlySummaries.sort(
-        (a, b) => new Date(b.entries[0]?.date || 0) - new Date(a.entries[0]?.date || 0)
+        (a, b) =>
+          new Date(b.entries[0]?.date || 0) - new Date(a.entries[0]?.date || 0)
       ),
       totals: {
         realizedGain: totalGain,
@@ -1196,14 +1198,15 @@ const HistorySummary = ({
     );
 
   return (
-    <div className="mt-10">
+    // <div className="mt-10">
+    <div className="mt-10 bg-white rounded-xl shadow p-6">
       {/* Header Summary */}
       <h2 className="text-xl font-semibold mb-2 text-gray-800 flex items-center gap-2">
         <FileText className="w-5 h-5 text-indigo-600" />
         History
       </h2>
 
-      <div className="mb-6 p-4 bg-white rounded-xl flex flex-col sm:flex-row justify-between items-center shadow">
+      <div className="mb-6 p-4 bg-white rounded-xl flex flex-col sm:flex-row justify-between items-center shadow border-t border-indigo-300">
         <div className="text-lg font-medium text-gray-700 flex items-center gap-2">
           <Wallet className="w-5 h-5 text-green-600" />
           All-Time Realized Gain/Loss:
@@ -1212,14 +1215,21 @@ const HistorySummary = ({
               totals.realizedGain >= 0 ? "text-green-600" : "text-red-600"
             }`}
           >
-            Rs. {Math.abs(totals.realizedGain).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            Rs.{" "}
+            {Math.abs(totals.realizedGain).toLocaleString(undefined, {
+              maximumFractionDigits: 0,
+            })}
           </span>
         </div>
+
         <div className="text-lg font-medium text-gray-700 mt-2 sm:mt-0 flex items-center gap-2">
           <Coins className="w-5 h-5 text-amber-600" />
           Total Dividends:
           <span className="ml-1 font-semibold text-amber-600">
-            Rs. {totals.totalDividends.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            Rs.{" "}
+            {totals.totalDividends.toLocaleString(undefined, {
+              maximumFractionDigits: 0,
+            })}
           </span>
         </div>
       </div>
@@ -1228,55 +1238,97 @@ const HistorySummary = ({
       {history.map(({ month, entries, monthGain, monthDiv }) => {
         const isExpanded = expandedMonths[month];
         const totalMonth =
-          (monthGain >= 0 ? "+" : "") + monthGain.toLocaleString(undefined, { maximumFractionDigits: 0 });
+          (monthGain >= 0 ? "+" : "") +
+          monthGain.toLocaleString(undefined, { maximumFractionDigits: 0 });
 
         return (
-          <div key={month} className="mb-4 bg-white rounded-xl shadow overflow-hidden">
+          <div
+            key={month}
+            className="mb-4 bg-white rounded-xl shadow overflow-hidden"
+          >
             <button
               onClick={() => toggleMonth(month)}
-              className="w-full flex justify-between items-center px-5 py-3 bg-indigo-100 hover:bg-indigo-200 transition"
+              className="w-full flex justify-between items-center px-5 py-3 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition rounded-t-xl"
             >
-              <div className="flex items-center gap-2 text-gray-800 font-semibold">
-                {isExpanded ? <ChevronDown className="w-5 h-5 text-indigo-600" /> : <ChevronRight className="w-5 h-5 text-indigo-600" />}
+              <div className="flex items-center gap-2 font-semibold">
+                {isExpanded ? (
+                  <ChevronDown className="w-5 h-5 text-indigo-600" />
+                ) : (
+                  <ChevronRight className="w-5 h-5 text-indigo-600" />
+                )}
                 {month}
               </div>
+
               <div className="text-sm text-gray-600 flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-indigo-500" />
                 Total Realized:
-                <span className={`font-semibold ${monthGain >= 0 ? "text-green-600" : "text-red-600"}`}>
+                <span
+                  className={`font-semibold ${
+                    monthGain >= 0 ? "text-green-600" : "text-red-600"
+                  }`}
+                >
                   Rs. {totalMonth}
                 </span>
                 <Coins className="w-4 h-4 text-amber-500 ml-2" />
                 Dividends:
                 <span className="font-semibold text-amber-600">
-                  Rs. {monthDiv.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                  Rs.{" "}
+                  {monthDiv.toLocaleString(undefined, {
+                    maximumFractionDigits: 0,
+                  })}
                 </span>
               </div>
             </button>
 
             {/* Expandable Section */}
-            <div className={`transition-all duration-300 overflow-hidden ${isExpanded ? "max-h-[1000px] p-5" : "max-h-0"}`}>
+            <div
+              className={`transition-all duration-300 overflow-hidden ${
+                isExpanded ? "max-h-[1000px] p-5" : "max-h-0"
+              }`}
+            >
               {entries.map((item, idx) => {
-                const profitColor = item.gain >= 0 ? "text-green-600" : "text-red-600";
-                const Icon = item.type === "sell" ? (item.gain >= 0 ? TrendingUp : TrendingDown) : Coins;
-                const actionText = item.type === "sell" ? (item.gain >= 0 ? "made a profit of" : "incurred a loss of") : "received dividend income worth";
-                const dateStr = new Date(item.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+                const profitColor =
+                  item.gain >= 0 ? "text-green-600" : "text-red-600";
+                const Icon =
+                  item.type === "sell"
+                    ? item.gain >= 0
+                      ? TrendingUp
+                      : TrendingDown
+                    : Coins;
+                const actionText =
+                  item.type === "sell"
+                    ? item.gain >= 0
+                      ? "made a profit of"
+                      : "incurred a loss of"
+                    : "received dividend income worth";
+                const dateStr = new Date(item.date).toLocaleDateString(
+                  "en-GB",
+                  { day: "2-digit", month: "short", year: "numeric" }
+                );
 
                 return (
-                  <div key={idx} className="flex items-start gap-2 text-gray-700 py-2 border-b border-gray-100 last:border-none">
+                  <div
+                    key={idx}
+                    className="flex items-start gap-2 text-gray-700 py-2 border-b border-gray-100 last:border-none"
+                  >
                     <Icon className={`${profitColor} w-4 h-4 mt-1`} />
                     <div>
                       <span className="font-semibold">{item.symbol}</span>{" "}
                       <span className="text-sm text-gray-500">({dateStr})</span>{" "}
                       — You {actionText}{" "}
                       <span className={`font-semibold ${profitColor}`}>
-                        Rs. {Math.abs(item.gain).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                        Rs.{" "}
+                        {Math.abs(item.gain).toLocaleString(undefined, {
+                          maximumFractionDigits: 0,
+                        })}
                       </span>
                       {item.pct !== null && (
                         <>
-                          {" "}with{" "}
+                          {" "}
+                          with{" "}
                           <span className={`font-semibold ${profitColor}`}>
-                            {item.pct >= 0 ? "+" : ""}{item.pct.toFixed(2)}%
+                            {item.pct >= 0 ? "+" : ""}
+                            {item.pct.toFixed(2)}%
                           </span>{" "}
                           {item.gain >= 0 ? "increase" : "decrease"}.
                         </>
