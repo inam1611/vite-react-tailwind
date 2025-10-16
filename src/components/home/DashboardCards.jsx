@@ -444,7 +444,7 @@ const DashboardCards = ({ summary = {} }) => {
     returnPct: todayReturn,
   },
   {
-    title: "Last 7 Days Performance",
+    title: "Realized Gain/Loss",
     value: `Rs. ${weekPerf >= 0 ? "+" : "-"}${Math.abs(weekPerf).toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
     icon: weekReturn >= 0 ? <TrendingUp className="text-green-600" /> : <TrendingDown className="text-red-600" />,
     returnPct: weekReturn,
