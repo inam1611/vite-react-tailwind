@@ -24,9 +24,17 @@ export default function useStockData(holdings, refreshInterval = REFRESH_INTERVA
                   .join(" ")
               : "—",
             currentPrice: data.closingPrice || 0,
+            open: data.open || 0,              // <--- add this
+            high: data.high || 0,              // optional
+            low: data.low || 0,                // optional
+            volume: data.volume || 0,          // optional
+            peRatio: data.peRatio || 0,        // optional
+            high52Week: data.high52Week || 0,  // optional
+            low52Week: data.low52Week || 0,    // optional
             changeValue: data.changeValue || 0,
             changePercent: data.changePercent || "(0%)",
           };
+
         }
       } catch (err) {
         console.error(`Error fetching ${h.symbol}:`, err);

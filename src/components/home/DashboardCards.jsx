@@ -424,44 +424,33 @@ const DashboardCards = ({ summary = {} }) => {
   } = summary;
 
   const cards = [
-    {
-      title: "Total Invested",
-      value: `Rs. ${totalInvested.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
-      subtitle: "Total Value",
-      subtitleValue: `Rs. ${totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
-      icon: <DollarSign className="text-indigo-600" />,
-    },
-    {
-      title: "Total Gain/Loss",
-      value: `Rs. ${gainLoss.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
-      icon: gainLoss >= 0 ? (
-        <TrendingUp className="text-green-600" />
-      ) : (
-        <TrendingDown className="text-red-600" />
-      ),
-      returnPct: returnPercent,
-    },
-    {
-      title: "Today Performance",
-      value: `Rs. ${todayPerf.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
-      icon: todayReturn >= 0 ? (
-        <TrendingUp className="text-green-600" />
-      ) : (
-        <TrendingDown className="text-red-600" />
-      ),
-      returnPct: todayReturn,
-    },
-    {
-      title: "Last 7 Days Performance",
-      value: `Rs. ${weekPerf.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
-      icon: weekReturn >= 0 ? (
-        <TrendingUp className="text-green-600" />
-      ) : (
-        <TrendingDown className="text-red-600" />
-      ),
-      returnPct: weekReturn,
-    },
-  ];
+  {
+    title: "Total Invested",
+    value: `Rs. ${totalInvested.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+    subtitle: "Total Value",
+    subtitleValue: `Rs. ${totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+    icon: <DollarSign className="text-indigo-600" />,
+  },
+  {
+    title: "Total Gain/Loss",
+    value: `Rs. ${gainLoss >= 0 ? "+" : "-"}${Math.abs(gainLoss).toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+    icon: gainLoss >= 0 ? <TrendingUp className="text-green-600" /> : <TrendingDown className="text-red-600" />,
+    returnPct: returnPercent,
+  },
+  {
+    title: "Today Performance",
+    value: `Rs. ${todayPerf >= 0 ? "+" : "-"}${Math.abs(todayPerf).toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+    icon: todayReturn >= 0 ? <TrendingUp className="text-green-600" /> : <TrendingDown className="text-red-600" />,
+    returnPct: todayReturn,
+  },
+  {
+    title: "Last 7 Days Performance",
+    value: `Rs. ${weekPerf >= 0 ? "+" : "-"}${Math.abs(weekPerf).toLocaleString(undefined, { maximumFractionDigits: 0 })}`,
+    icon: weekReturn >= 0 ? <TrendingUp className="text-green-600" /> : <TrendingDown className="text-red-600" />,
+    returnPct: weekReturn,
+  },
+];
+
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
