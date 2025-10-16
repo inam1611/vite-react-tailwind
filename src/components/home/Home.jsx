@@ -1120,7 +1120,9 @@ const Home = () => {
   const { transactions, selectedPortfolio, loading } = useTransactions(currentUser);
   const holdings = useHoldings(transactions, selectedPortfolio);
   const { stockData, lastUpdated } = useStockData(holdings);
-  const summary = useSummary(holdings, stockData);
+  // const summary = useSummary(holdings, stockData);
+  const summary = useSummary(holdings, stockData, transactions);
+
 
   if (loading)
     return (
