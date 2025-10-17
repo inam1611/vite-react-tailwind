@@ -196,19 +196,78 @@
 // export default App;
 
 
+// import React from "react";
+// import { Navigate, useRoutes } from "react-router-dom";
+// import { AuthProvider, useAuth } from "./contexts/authContext";
+
+// import Login from "./components/auth/login";
+// import Register from "./components/auth/register";
+// import Header from "./components/header";
+// import Home from "./components/home/Home";
+// import Transactions from "./components/transactions/Transactions"; // ✅ renamed
+// import Profile from "./pages/Profile";
+// import Settings from "./pages/Settings";
+// import ProtectedRoute from "./components/ProtectedRoute";
+// import DashboardLayout from "./components/layouts/DashboardLayout"; // ✅ new import
+
+// const RootRedirect = () => {
+//   const { userLoggedIn } = useAuth();
+//   return userLoggedIn ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />;
+// };
+
+// function AppRoutes() {
+//   const routesArray = [
+//     { path: "/", element: <RootRedirect /> },
+//     { path: "/login", element: <Login /> },
+//     { path: "/register", element: <Register /> },
+
+//     // ✅ Protected routes with DashboardLayout
+//     {
+//       path: "/",
+//       element: (
+//         <ProtectedRoute>
+//           <DashboardLayout />
+//         </ProtectedRoute>
+//       ),
+//       children: [
+//         { path: "home", element: <Home /> },
+//         { path: "transactions", element: <Transactions /> }, // ✅ replaced main
+//         { path: "profile", element: <Profile /> },
+//         { path: "settings", element: <Settings /> },
+//       ],
+//     },
+
+//     { path: "*", element: <Navigate to="/" replace /> },
+//   ];
+
+//   return useRoutes(routesArray);
+// }
+
+// function App() {
+//   return (
+//     <AuthProvider>
+//       <div className="w-full h-screen flex flex-col">
+//         <AppRoutes />
+//       </div>
+//     </AuthProvider>
+//   );
+// }
+
+// export default App;
+
 import React from "react";
 import { Navigate, useRoutes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/authContext";
 
 import Login from "./components/auth/login";
 import Register from "./components/auth/register";
-import Header from "./components/header";
 import Home from "./components/home/Home";
-import Transactions from "./components/transactions/Transactions"; // ✅ renamed
+import Transactions from "./components/transactions/Transactions";
+import PortfolioOverview from "./components/portfolio/PortfolioOverview"; 
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import ProtectedRoute from "./components/ProtectedRoute";
-import DashboardLayout from "./components/layouts/DashboardLayout"; // ✅ new import
+import DashboardLayout from "./components/layouts/DashboardLayout";
 
 const RootRedirect = () => {
   const { userLoggedIn } = useAuth();
@@ -231,7 +290,8 @@ function AppRoutes() {
       ),
       children: [
         { path: "home", element: <Home /> },
-        { path: "transactions", element: <Transactions /> }, // ✅ replaced main
+        { path: "portfolio", element: <PortfolioOverview /> }, // ✅ new route
+        { path: "transactions", element: <Transactions /> },
         { path: "profile", element: <Profile /> },
         { path: "settings", element: <Settings /> },
       ],

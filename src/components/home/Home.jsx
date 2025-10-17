@@ -1230,6 +1230,7 @@ import DashboardCards from "./DashboardCards";
 import HoldingsTable from "./HoldingsTable";
 import LastUpdated from "./LastUpdated";
 import HistorySummary from "./HistorySummary";
+import PortfolioOverview from "../portfolio/PortfolioOverview";
 
 const Home = () => {
   const { currentUser } = useAuth();
@@ -1277,6 +1278,7 @@ const Home = () => {
         selectedPortfolio={selectedPortfolio}
         onTotalsComputed={setTotals}
       />
+      
     </div>
   );
 };
