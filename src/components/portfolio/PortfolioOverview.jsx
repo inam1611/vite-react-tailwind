@@ -356,6 +356,7 @@ import IndustryAllocationPie from "./IndustryAllocationPie";
 import DividendBarChart from "./DividendBarChart";
 import GainLossBarChart from "./GainLossBarChart";
 
+
 const PortfolioOverview = () => {
   const { currentUser } = useAuth();
   const { transactions, selectedPortfolio } = useTransactions(currentUser);
@@ -386,8 +387,11 @@ const PortfolioOverview = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <StockAllocationPie holdings={holdings} />
         <IndustryAllocationPie holdings={holdings} stockData={stockData} />
-      </div>
+        {/* ===== Allocation Chart ===== */}
+     
 
+      </div>
+      
       {/* ===== Performance Charts ===== */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <DividendBarChart

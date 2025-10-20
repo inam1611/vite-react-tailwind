@@ -189,7 +189,7 @@
 
 import React, { useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
-import Header from "../header";
+import Header from "../header/header";
 import {
   HomeIcon,
   BanknotesIcon,

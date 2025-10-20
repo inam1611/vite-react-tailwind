@@ -1054,6 +1054,299 @@
 
 // export default HistorySummary;
 
+// import React, { useMemo, useState, useEffect } from "react";
+// import {
+//   ChevronDown,
+//   ChevronRight,
+//   TrendingUp,
+//   TrendingDown,
+//   Coins,
+//   FileText,
+//   BarChart3,
+//   Wallet,
+// } from "lucide-react";
+
+// const HistorySummary = ({
+//   transactions = [],
+//   selectedPortfolio,
+//   onTotalsComputed, // callback to pass totals upward
+// }) => {
+//   const [expandedMonths, setExpandedMonths] = useState({});
+
+//   const { history, totals } = useMemo(() => {
+//     const grouped = {};
+//     let totalGain = 0;
+//     let totalDividends = 0;
+//     let totalInvested = 0;
+
+//     transactions
+//       .filter((tx) => tx.portfolio === selectedPortfolio)
+//       .forEach((tx) => {
+//         const { symbol, type, quantity, price, date } = tx;
+//         const qty = parseFloat(quantity) || 0;
+//         const p = parseFloat(price) || 0;
+//         const t = (type || "").toLowerCase();
+
+//         const monthKey = new Date(date).toLocaleString("default", {
+//           month: "short",
+//           year: "numeric",
+//         });
+
+//         if (!grouped[monthKey]) grouped[monthKey] = {};
+//         if (!grouped[monthKey][symbol]) {
+//           grouped[monthKey][symbol] = {
+//             buys: [],
+//             sells: [],
+//             dividends: [],
+//             totalBuy: 0,
+//             totalSell: 0,
+//             totalDividend: 0,
+//             lastDate: date,
+//           };
+//         }
+
+//         const sym = grouped[monthKey][symbol];
+//         sym.lastDate = date;
+
+//         if (t === "buy") {
+//           sym.buys.push({ qty, p, date });
+//           sym.totalBuy += qty * p;
+//           totalInvested += qty * p;
+//         } else if (t === "sell") {
+//           sym.sells.push({ qty, p, date });
+//           sym.totalSell += qty * p;
+//         } else if (t === "dividend") {
+//           sym.dividends.push({ qty, p, date });
+//           sym.totalDividend += qty * p;
+//           totalDividends += qty * p;
+//         }
+//       });
+
+//     const monthlySummaries = Object.entries(grouped).map(([month, symbols]) => {
+//       const entries = [];
+//       let monthGain = 0;
+//       let monthDiv = 0;
+
+//       for (const [symbol, data] of Object.entries(symbols)) {
+//         if (data.sells.length > 0) {
+//           const gain = data.totalSell - data.totalBuy;
+//           const pct = data.totalBuy > 0 ? (gain / data.totalBuy) * 100 : 0;
+//           const lastDate = data.sells[data.sells.length - 1].date;
+//           monthGain += gain;
+//           entries.push({
+//             symbol,
+//             gain,
+//             pct,
+//             type: "sell",
+//             date: lastDate,
+//           });
+//         }
+
+//         if (data.totalDividend > 0) {
+//           const lastDate = data.dividends[data.dividends.length - 1].date;
+//           monthDiv += data.totalDividend;
+//           entries.push({
+//             symbol,
+//             gain: data.totalDividend,
+//             pct: null,
+//             type: "dividend",
+//             date: lastDate,
+//           });
+//         }
+//       }
+
+//       totalGain += monthGain;
+
+//       return {
+//         month,
+//         entries: entries.sort((a, b) => new Date(b.date) - new Date(a.date)),
+//         monthGain,
+//         monthDiv,
+//       };
+//     });
+
+//     // Compute realized return % based on totalInvested
+//     const realizedReturn =
+//       totalInvested > 0 ? (totalGain / totalInvested) * 100 : 0;
+
+//     return {
+//       history: monthlySummaries.sort(
+//         (a, b) =>
+//           new Date(b.entries[0]?.date || 0) - new Date(a.entries[0]?.date || 0)
+//       ),
+//       totals: {
+//         realizedGain: totalGain,
+//         realizedReturn,
+//         totalDividends,
+//       },
+//     };
+//   }, [transactions, selectedPortfolio]);
+
+//   // Emit totals upward whenever they change
+//   useEffect(() => {
+//     if (onTotalsComputed) onTotalsComputed(totals);
+//   }, [totals, onTotalsComputed]);
+
+//   const toggleMonth = (month) =>
+//     setExpandedMonths((prev) => ({ ...prev, [month]: !prev[month] }));
+
+//   if (!history.length)
+//     return (
+//       <div className="mt-10 text-gray-500 text-center italic">
+//         No realized history yet for this portfolio.
+//       </div>
+//     );
+
+//   return (
+//     // <div className="mt-10">
+//     <div className="mt-10 bg-white rounded-xl shadow p-6">
+//       {/* Header Summary */}
+//       <h2 className="text-xl font-semibold mb-2 text-gray-800 flex items-center gap-2">
+//         <FileText className="w-5 h-5 text-indigo-600" />
+//         History
+//       </h2>
+
+//       <div className="mb-6 p-4 bg-white rounded-xl flex flex-col sm:flex-row justify-between items-center shadow border-t border-indigo-300">
+//         <div className="text-lg font-medium text-gray-700 flex items-center gap-2">
+//           <Wallet className="w-5 h-5 text-green-600" />
+//           All-Time Realized Gain/Loss:
+//           <span
+//             className={`ml-2 font-semibold ${
+//               totals.realizedGain >= 0 ? "text-green-600" : "text-red-600"
+//             }`}
+//           >
+//             Rs.{" "}
+//             {Math.abs(totals.realizedGain).toLocaleString(undefined, {
+//               maximumFractionDigits: 0,
+//             })}
+//           </span>
+//         </div>
+
+//         <div className="text-lg font-medium text-gray-700 mt-2 sm:mt-0 flex items-center gap-2">
+//           <Coins className="w-5 h-5 text-amber-600" />
+//           Total Dividends:
+//           <span className="ml-1 font-semibold text-amber-600">
+//             Rs.{" "}
+//             {totals.totalDividends.toLocaleString(undefined, {
+//               maximumFractionDigits: 0,
+//             })}
+//           </span>
+//         </div>
+//       </div>
+
+//       {/* Monthly Blocks */}
+//       {history.map(({ month, entries, monthGain, monthDiv }) => {
+//         const isExpanded = expandedMonths[month];
+//         const totalMonth =
+//           (monthGain >= 0 ? "+" : "") +
+//           monthGain.toLocaleString(undefined, { maximumFractionDigits: 0 });
+
+//         return (
+//           <div
+//             key={month}
+//             className="mb-4 bg-white rounded-xl shadow overflow-hidden"
+//           >
+//             <button
+//               onClick={() => toggleMonth(month)}
+//               className="w-full flex justify-between items-center px-5 py-3 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition rounded-t-xl"
+//             >
+//               <div className="flex items-center gap-2 font-semibold">
+//                 {isExpanded ? (
+//                   <ChevronDown className="w-5 h-5 text-indigo-600" />
+//                 ) : (
+//                   <ChevronRight className="w-5 h-5 text-indigo-600" />
+//                 )}
+//                 {month}
+//               </div>
+
+//               <div className="text-sm text-gray-600 flex items-center gap-2">
+//                 <BarChart3 className="w-4 h-4 text-indigo-500" />
+//                 Total Realized:
+//                 <span
+//                   className={`font-semibold ${
+//                     monthGain >= 0 ? "text-green-600" : "text-red-600"
+//                   }`}
+//                 >
+//                   Rs. {totalMonth}
+//                 </span>
+//                 <Coins className="w-4 h-4 text-amber-500 ml-2" />
+//                 Dividends:
+//                 <span className="font-semibold text-amber-600">
+//                   Rs.{" "}
+//                   {monthDiv.toLocaleString(undefined, {
+//                     maximumFractionDigits: 0,
+//                   })}
+//                 </span>
+//               </div>
+//             </button>
+
+//             {/* Expandable Section */}
+//             <div
+//               className={`transition-all duration-300 overflow-hidden ${
+//                 isExpanded ? "max-h-[1000px] p-5" : "max-h-0"
+//               }`}
+//             >
+//               {entries.map((item, idx) => {
+//                 const profitColor =
+//                   item.gain >= 0 ? "text-green-600" : "text-red-600";
+//                 const Icon =
+//                   item.type === "sell"
+//                     ? item.gain >= 0
+//                       ? TrendingUp
+//                       : TrendingDown
+//                     : Coins;
+//                 const actionText =
+//                   item.type === "sell"
+//                     ? item.gain >= 0
+//                       ? "made a profit of"
+//                       : "incurred a loss of"
+//                     : "received dividend income worth";
+//                 const dateStr = new Date(item.date).toLocaleDateString(
+//                   "en-GB",
+//                   { day: "2-digit", month: "short", year: "numeric" }
+//                 );
+
+//                 return (
+//                   <div
+//                     key={idx}
+//                     className="flex items-start gap-2 text-gray-700 py-2 border-b border-gray-100 last:border-none"
+//                   >
+//                     <Icon className={`${profitColor} w-4 h-4 mt-1`} />
+//                     <div>
+//                       <span className="font-semibold">{item.symbol}</span>{" "}
+//                       <span className="text-sm text-gray-500">({dateStr})</span>{" "}
+//                       — You {actionText}{" "}
+//                       <span className={`font-semibold ${profitColor}`}>
+//                         Rs.{" "}
+//                         {Math.abs(item.gain).toLocaleString(undefined, {
+//                           maximumFractionDigits: 0,
+//                         })}
+//                       </span>
+//                       {item.pct !== null && (
+//                         <>
+//                           {" "}
+//                           with{" "}
+//                           <span className={`font-semibold ${profitColor}`}>
+//                             {item.pct >= 0 ? "+" : ""}
+//                             {item.pct.toFixed(2)}%
+//                           </span>{" "}
+//                           {item.gain >= 0 ? "increase" : "decrease"}.
+//                         </>
+//                       )}
+//                     </div>
+//                   </div>
+//                 );
+//               })}
+//             </div>
+//           </div>
+//         );
+//       })}
+//     </div>
+//   );
+// };
+
+// export default HistorySummary;
+
 import React, { useMemo, useState, useEffect } from "react";
 import {
   ChevronDown,
@@ -1122,57 +1415,69 @@ const HistorySummary = ({
         }
       });
 
-    const monthlySummaries = Object.entries(grouped).map(([month, symbols]) => {
-      const entries = [];
-      let monthGain = 0;
-      let monthDiv = 0;
+    // Only include months with actual activity
+    const monthlySummaries = Object.entries(grouped)
+      .map(([month, symbols]) => {
+        const entries = [];
+        let monthGain = 0;
+        let monthDiv = 0;
 
-      for (const [symbol, data] of Object.entries(symbols)) {
-        if (data.sells.length > 0) {
-          const gain = data.totalSell - data.totalBuy;
-          const pct = data.totalBuy > 0 ? (gain / data.totalBuy) * 100 : 0;
-          const lastDate = data.sells[data.sells.length - 1].date;
-          monthGain += gain;
-          entries.push({
-            symbol,
-            gain,
-            pct,
-            type: "sell",
-            date: lastDate,
-          });
+        for (const [symbol, data] of Object.entries(symbols)) {
+          // Add sell entries with non-zero gain
+          if (data.sells.length > 0) {
+            const gain = data.totalSell - data.totalBuy;
+            if (gain !== 0) {
+              const pct = data.totalBuy > 0 ? (gain / data.totalBuy) * 100 : 0;
+              const lastDate = data.sells[data.sells.length - 1].date;
+              monthGain += gain;
+              entries.push({
+                symbol,
+                gain,
+                pct,
+                type: "sell",
+                date: lastDate,
+              });
+            }
+          }
+
+          // Add dividend entries with non-zero value
+          if (data.totalDividend > 0) {
+            const lastDate = data.dividends[data.dividends.length - 1].date;
+            monthDiv += data.totalDividend;
+            entries.push({
+              symbol,
+              gain: data.totalDividend,
+              pct: null,
+              type: "dividend",
+              date: lastDate,
+            });
+          }
         }
 
-        if (data.totalDividend > 0) {
-          const lastDate = data.dividends[data.dividends.length - 1].date;
-          monthDiv += data.totalDividend;
-          entries.push({
-            symbol,
-            gain: data.totalDividend,
-            pct: null,
-            type: "dividend",
-            date: lastDate,
-          });
+        totalGain += monthGain;
+
+        // Only include month if it has gain or dividends
+        if (monthGain !== 0 || monthDiv !== 0) {
+          return {
+            month,
+            entries: entries.sort(
+              (a, b) => new Date(b.date) - new Date(a.date)
+            ),
+            monthGain,
+            monthDiv,
+          };
+        } else {
+          return null;
         }
-      }
+      })
+      .filter(Boolean);
 
-      totalGain += monthGain;
-
-      return {
-        month,
-        entries: entries.sort((a, b) => new Date(b.date) - new Date(a.date)),
-        monthGain,
-        monthDiv,
-      };
-    });
-
-    // Compute realized return % based on totalInvested
     const realizedReturn =
       totalInvested > 0 ? (totalGain / totalInvested) * 100 : 0;
 
     return {
       history: monthlySummaries.sort(
-        (a, b) =>
-          new Date(b.entries[0]?.date || 0) - new Date(a.entries[0]?.date || 0)
+        (a, b) => new Date(b.entries[0]?.date || 0) - new Date(a.entries[0]?.date || 0)
       ),
       totals: {
         realizedGain: totalGain,
@@ -1182,7 +1487,6 @@ const HistorySummary = ({
     };
   }, [transactions, selectedPortfolio]);
 
-  // Emit totals upward whenever they change
   useEffect(() => {
     if (onTotalsComputed) onTotalsComputed(totals);
   }, [totals, onTotalsComputed]);
@@ -1198,7 +1502,6 @@ const HistorySummary = ({
     );
 
   return (
-    // <div className="mt-10">
     <div className="mt-10 bg-white rounded-xl shadow p-6">
       {/* Header Summary */}
       <h2 className="text-xl font-semibold mb-2 text-gray-800 flex items-center gap-2">

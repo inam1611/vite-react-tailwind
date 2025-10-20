@@ -116,7 +116,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-const REFRESH_INTERVAL = 30 * 60 * 1000; // 3 minutes
+const REFRESH_INTERVAL = 30 * 60 * 1000; 
 const CACHE_KEY = "stockDataCache";
 
 export default function useStockData(holdings, refreshInterval = REFRESH_INTERVAL) {

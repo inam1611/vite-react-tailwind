@@ -1220,12 +1220,81 @@
 
 // export default Home;
 
-import React, { useState } from "react";
+// import React, { useState } from "react";
+// import { useAuth } from "../../contexts/authContext";
+// import useTransactions from "./hooks/useTransactions";
+// import useHoldings from "./hooks/useHoldings";
+// import useStockData from "./hooks/useStockData";
+// import useSummary from "./hooks/useSummary";
+// import DashboardCards from "./DashboardCards";
+// import HoldingsTable from "./HoldingsTable";
+// import LastUpdated from "./LastUpdated";
+// import HistorySummary from "./HistorySummary";
+// import PortfolioOverview from "../portfolio/PortfolioOverview";
+
+// const Home = () => {
+//   const { currentUser } = useAuth();
+//   const { transactions, selectedPortfolio, loading } = useTransactions(currentUser);
+//   const holdings = useHoldings(transactions, selectedPortfolio);
+//   const { stockData, lastUpdated } = useStockData(holdings);
+//   const summary = useSummary(holdings, stockData);
+
+//   const [totals, setTotals] = useState({
+//     realizedGain: 0,
+//     realizedReturn: 0,
+//     totalDividends: 0,
+//   });
+
+//   if (loading)
+//     return (
+//       <div className="flex justify-center items-center min-h-[calc(100vh-4rem)]">
+//         <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+//       </div>
+//     );
+
+//   const dashboardSummary = {
+//     ...summary,
+//     realizedGain: totals.realizedGain,
+//     realizedReturn: totals.realizedReturn,
+//     totalDividends: totals.totalDividends,
+//   };
+
+//   return (
+//     <div className="pt-14 px-6">
+//       <div className="text-3xl font-semibold mb-6 text-gray-800">
+//         Welcome, <span className="text-indigo-600">{currentUser.displayName || "User"}</span>
+//       </div>
+
+//       <p className="text-gray-600 mb-6">
+//         Showing holdings for: <span className="font-semibold text-indigo-700">{selectedPortfolio}</span>
+//       </p>
+
+//       <DashboardCards summary={dashboardSummary} />
+
+//       <HoldingsTable holdings={holdings} stockData={stockData} />
+//       <LastUpdated date={lastUpdated} />
+//       <HistorySummary
+//         transactions={transactions}
+//         selectedPortfolio={selectedPortfolio}
+//         onTotalsComputed={setTotals}
+//       />
+      
+//     </div>
+//   );
+// };
+
+// export default Home;
+
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/authContext";
+import { db } from "../../firebase/firebase";
+import { doc, getDoc } from "firebase/firestore";
+
 import useTransactions from "./hooks/useTransactions";
 import useHoldings from "./hooks/useHoldings";
 import useStockData from "./hooks/useStockData";
 import useSummary from "./hooks/useSummary";
+
 import DashboardCards from "./DashboardCards";
 import HoldingsTable from "./HoldingsTable";
 import LastUpdated from "./LastUpdated";
@@ -1234,7 +1303,9 @@ import PortfolioOverview from "../portfolio/PortfolioOverview";
 
 const Home = () => {
   const { currentUser } = useAuth();
-  const { transactions, selectedPortfolio, loading } = useTransactions(currentUser);
+  const [userData, setUserData] = useState(null);
+
+  const { transactions, selectedPortfolio, loading: txLoading } = useTransactions(currentUser);
   const holdings = useHoldings(transactions, selectedPortfolio);
   const { stockData, lastUpdated } = useStockData(holdings);
   const summary = useSummary(holdings, stockData);
@@ -1245,7 +1316,18 @@ const Home = () => {
     totalDividends: 0,
   });
 
-  if (loading)
+  // Fetch user data from Firebase
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!currentUser) return;
+      const ref = doc(db, "users", currentUser.uid);
+      const snap = await getDoc(ref);
+      if (snap.exists()) setUserData(snap.data());
+    };
+    fetchUserData();
+  }, [currentUser]);
+
+  if (txLoading)
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-4rem)]">
         <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
@@ -1261,24 +1343,41 @@ const Home = () => {
 
   return (
     <div className="pt-14 px-6">
-      <div className="text-3xl font-semibold mb-6 text-gray-800">
-        Hello, <span className="text-indigo-600">{currentUser.displayName || currentUser.email}</span>
+      {/* ===== Welcome ===== */}
+      <div className="flex items-center gap-3 mb-6">
+        {userData?.avatar && (
+          <img
+            src={userData.avatar}
+            alt="Avatar"
+            className="w-10 h-10 rounded-full border-2 border-indigo-500"
+          />
+        )}
+        <div className="text-3xl font-semibold text-gray-800">
+          Welcome, <span className="text-indigo-600">{userData?.displayName || "User"}</span>
+        </div>
       </div>
 
       <p className="text-gray-600 mb-6">
-        Showing holdings for: <span className="font-semibold text-indigo-700">{selectedPortfolio}</span>
+        Showing holdings for:{" "}
+        <span className="font-semibold text-indigo-700">{selectedPortfolio}</span>
       </p>
 
+      {/* ===== Dashboard Cards ===== */}
       <DashboardCards summary={dashboardSummary} />
 
+      {/* ===== Holdings Table ===== */}
       <HoldingsTable holdings={holdings} stockData={stockData} />
+
+      {/* ===== Last Updated ===== */}
       <LastUpdated date={lastUpdated} />
+
+      {/* ===== History Summary (Realized Gain/Return) ===== */}
       <HistorySummary
         transactions={transactions}
         selectedPortfolio={selectedPortfolio}
         onTotalsComputed={setTotals}
       />
-      
+
     </div>
   );
 };
