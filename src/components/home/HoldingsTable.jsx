@@ -1590,6 +1590,188 @@
 // export default HoldingsTable;
 
 
+// import React, { useState } from "react";
+// import { Info, BarChart2 } from "lucide-react";
+
+// const HoldingsTable = ({ holdings = [], stockData = {} }) => {
+//   const [expandedSymbol, setExpandedSymbol] = useState(null);
+
+//   const formatNumber = (num, decimals = 2) =>
+//     num?.toLocaleString("en-IN", {
+//       minimumFractionDigits: decimals,
+//       maximumFractionDigits: decimals,
+//     });
+
+//   const toggleExpand = (symbol) => {
+//     setExpandedSymbol(expandedSymbol === symbol ? null : symbol);
+//   };
+
+//   return (
+//     <div className="bg-white shadow-sm border border-gray-100 rounded-2xl p-6 relative">
+//       {/* Header */}
+//       <div className="flex items-center justify-between mb-4">
+//         <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
+//           Current Holdings
+//         </h2>
+
+//         {/* Info Icon */}
+//         <div className="relative group">
+//           <Info className="w-5 h-5 text-indigo-600 cursor-pointer" />
+//           <span className="absolute -top-8 right-0 w-max px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 translate-y-1 group-hover:opacity-100 group-hover:-translate-y-1 transition-all duration-200 pointer-events-none whitespace-nowrap">
+//             Click stock symbol to see more info
+//           </span>
+//         </div>
+//       </div>
+
+//       <div className="overflow-x-auto max-h-[600px] rounded-lg relative">
+//         <table className="min-w-full text-sm">
+//           <thead className="sticky top-0 z-10 bg-indigo-50 text-indigo-700 text-xs uppercase tracking-wider">
+//             <tr>
+//               <th className="p-3 text-left font-semibold">Stock</th>
+//               <th className="p-3 text-left font-semibold">Industry</th>
+//               <th className="p-3 text-right font-semibold">Quantity</th>
+//               <th className="p-3 text-right font-semibold">Avg. Price (After Tax)</th>
+//               <th className="p-3 text-right font-semibold">Current Price</th>
+//               <th className="p-3 text-center font-semibold">Change</th>
+//               <th className="p-3 text-right font-semibold">Total Cost</th>
+//               <th className="p-3 text-right font-semibold">Current Value</th>
+//               <th className="p-3 text-right font-semibold">Gain/Loss</th>
+//               <th className="p-3 text-right font-semibold">Return %</th>
+//             </tr>
+//           </thead>
+
+//           <tbody className="divide-y divide-gray-100 text-gray-700 relative">
+//             {holdings.length > 0 ? (
+//               holdings.map((h) => {
+//                 const symbol = h.symbol;
+//                 const data = stockData[symbol] || {};
+//                 const currentPrice = Number(data.currentPrice) || 0;
+//                 const quantity = Number(h.quantity) || 0;
+//                 const totalCost = Number(h.totalCost) || 0;
+
+//                 const avgPrice = quantity > 0 ? totalCost / quantity : 0;
+//                 const currentValue = quantity * currentPrice;
+//                 const gainLoss = currentValue - totalCost;
+//                 const returnPct = totalCost > 0 ? (gainLoss / totalCost) * 100 : 0;
+
+//                 const isExpanded = expandedSymbol === symbol;
+
+//                 return (
+//                   <React.Fragment key={symbol}>
+//                     {/* Main Row */}
+//                     <tr
+//                       className="hover:bg-indigo-50/50 transition-colors duration-200 cursor-pointer"
+//                       onClick={() => toggleExpand(symbol)}
+//                     >
+//                       <td className="p-3 font-medium text-gray-800">
+//                         <div className="flex flex-col">
+//                           <span className="underline">{symbol}</span>
+//                           <span className="text-xs text-gray-500">{data.name || ""}</span>
+//                         </div>
+//                       </td>
+
+//                       <td className="p-3 text-gray-600">{data.industry || "—"}</td>
+
+//                       <td className="p-3 text-right text-gray-800">{quantity.toLocaleString("en-IN")}</td>
+
+//                       <td className="p-3 text-right text-gray-700">Rs. {formatNumber(avgPrice)}</td>
+
+//                       <td className="p-3 text-right text-gray-700">Rs. {formatNumber(currentPrice)}</td>
+
+//                       <td className="p-3 text-center">
+//                         {data.changeValue != null ? (
+//                           <div
+//                             className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium
+//                               ${
+//                                 data.changeValue > 0
+//                                   ? "bg-green-50 text-green-700"
+//                                   : data.changeValue < 0
+//                                   ? "bg-red-50 text-red-700"
+//                                   : "bg-gray-50 text-gray-600"
+//                               }`}
+//                           >
+//                             <span>{data.changeValue > 0 ? "▲" : data.changeValue < 0 ? "▼" : "•"}</span>
+//                             <span>
+//                               {Math.abs(data.changeValue).toFixed(2)}{" "}
+//                               <span className="text-[10px] opacity-70">
+//                                 ({data.changePercent?.replace(/[()]/g, "") || "0%"})
+//                               </span>
+//                             </span>
+//                           </div>
+//                         ) : (
+//                           <span className="text-gray-400">—</span>
+//                         )}
+//                       </td>
+
+//                       <td className="p-3 text-right text-gray-700">Rs. {formatNumber(totalCost)}</td>
+
+//                       <td className="p-3 text-right text-gray-700">Rs. {formatNumber(currentValue)}</td>
+
+//                       <td className={`p-3 text-right font-semibold ${gainLoss >= 0 ? "text-green-600" : "text-red-600"}`}>
+//                         Rs. {formatNumber(gainLoss)}
+//                       </td>
+
+//                       <td className={`p-3 text-right font-semibold ${returnPct >= 0 ? "text-green-600" : "text-red-600"}`}>
+//                         {formatNumber(returnPct, 2)}%
+//                       </td>
+//                     </tr>
+
+//                     {/* Expanded Row */}
+//                     {isExpanded && (
+//                       <tr className="bg-indigo-50/30 transition-all duration-300 ease-in-out">
+//                         <td colSpan={10} className="p-0 relative">
+//                           <div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-gray-700 text-sm bg-white border border-gray-100 rounded-xl shadow">
+//                             <div className="flex items-center gap-1">
+//                               <BarChart2 className="w-4 h-4 text-indigo-500" />
+//                               <span><strong>Open:</strong> Rs. {formatNumber(data.open)}</span>
+//                             </div>
+//                             <div className="flex items-center gap-1">
+//                               <BarChart2 className="w-4 h-4 text-green-600" />
+//                               <span><strong>High:</strong> Rs. {formatNumber(data.high)}</span>
+//                             </div>
+//                             <div className="flex items-center gap-1">
+//                               <BarChart2 className="w-4 h-4 text-red-600" />
+//                               <span><strong>Low:</strong> Rs. {formatNumber(data.low)}</span>
+//                             </div>
+//                             <div className="flex items-center gap-1">
+//                               <BarChart2 className="w-4 h-4 text-indigo-600" />
+//                               <span><strong>Volume:</strong> {formatNumber(data.volume, 0)}</span>
+//                             </div>
+//                             <div className="flex items-center gap-1">
+//                               <BarChart2 className="w-4 h-4 text-indigo-500" />
+//                               <span><strong>PE Ratio:</strong> {formatNumber(data.peRatio)}</span>
+//                             </div>
+//                             <div className="flex items-center gap-1">
+//                               <BarChart2 className="w-4 h-4 text-indigo-600" />
+//                               <span><strong>52W High:</strong> Rs. {formatNumber(data.high52Week)}</span>
+//                             </div>
+//                             <div className="flex items-center gap-1">
+//                               <BarChart2 className="w-4 h-4 text-indigo-600" />
+//                               <span><strong>52W Low:</strong> Rs. {formatNumber(data.low52Week)}</span>
+//                             </div>
+//                           </div>
+//                         </td>
+//                       </tr>
+//                     )}
+//                   </React.Fragment>
+//                 );
+//               })
+//             ) : (
+//               <tr>
+//                 <td className="p-6 text-gray-500 text-center" colSpan="10">
+//                   No holdings yet for this portfolio.
+//                 </td>
+//               </tr>
+//             )}
+//           </tbody>
+//         </table>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default HoldingsTable;
+
 import React, { useState } from "react";
 import { Info, BarChart2 } from "lucide-react";
 
@@ -1614,7 +1796,6 @@ const HoldingsTable = ({ holdings = [], stockData = {} }) => {
           Current Holdings
         </h2>
 
-        {/* Info Icon */}
         <div className="relative group">
           <Info className="w-5 h-5 text-indigo-600 cursor-pointer" />
           <span className="absolute -top-8 right-0 w-max px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 translate-y-1 group-hover:opacity-100 group-hover:-translate-y-1 transition-all duration-200 pointer-events-none whitespace-nowrap">
@@ -1656,6 +1837,18 @@ const HoldingsTable = ({ holdings = [], stockData = {} }) => {
 
                 const isExpanded = expandedSymbol === symbol;
 
+                // Detect “XD” or “CD” tags from name, but remove them for display
+                let name = data.name || "";
+                const badges = [];
+                if (name.toUpperCase().includes("XD")) {
+                  badges.push("XD");
+                  name = name.replace(/XD/gi, "").trim();
+                }
+                if (name.toUpperCase().includes("CD")) {
+                  badges.push("CD");
+                  name = name.replace(/CD/gi, "").trim();
+                }
+
                 return (
                   <React.Fragment key={symbol}>
                     {/* Main Row */}
@@ -1665,18 +1858,38 @@ const HoldingsTable = ({ holdings = [], stockData = {} }) => {
                     >
                       <td className="p-3 font-medium text-gray-800">
                         <div className="flex flex-col">
-                          <span className="underline">{symbol}</span>
-                          <span className="text-xs text-gray-500">{data.name || ""}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="underline">{symbol}</span>
+                            {badges.map((badge) => (
+                              <span
+                                key={badge}
+                                className={`text-[10px] px-1.5 py-0.5 rounded-md font-semibold border ${
+                                  badge === "XD"
+                                    ? "bg-yellow-100 text-yellow-700 border-yellow-200"
+                                    : "bg-blue-100 text-blue-700 border-blue-200"
+                                }`}
+                              >
+                                {badge}
+                              </span>
+                            ))}
+                          </div>
+                          <span className="text-xs text-gray-500">{name}</span>
                         </div>
                       </td>
 
                       <td className="p-3 text-gray-600">{data.industry || "—"}</td>
 
-                      <td className="p-3 text-right text-gray-800">{quantity.toLocaleString("en-IN")}</td>
+                      <td className="p-3 text-right text-gray-800">
+                        {quantity.toLocaleString("en-IN")}
+                      </td>
 
-                      <td className="p-3 text-right text-gray-700">Rs. {formatNumber(avgPrice)}</td>
+                      <td className="p-3 text-right text-gray-700">
+                        Rs. {formatNumber(avgPrice)}
+                      </td>
 
-                      <td className="p-3 text-right text-gray-700">Rs. {formatNumber(currentPrice)}</td>
+                      <td className="p-3 text-right text-gray-700">
+                        Rs. {formatNumber(currentPrice)}
+                      </td>
 
                       <td className="p-3 text-center">
                         {data.changeValue != null ? (
@@ -1690,7 +1903,13 @@ const HoldingsTable = ({ holdings = [], stockData = {} }) => {
                                   : "bg-gray-50 text-gray-600"
                               }`}
                           >
-                            <span>{data.changeValue > 0 ? "▲" : data.changeValue < 0 ? "▼" : "•"}</span>
+                            <span>
+                              {data.changeValue > 0
+                                ? "▲"
+                                : data.changeValue < 0
+                                ? "▼"
+                                : "•"}
+                            </span>
                             <span>
                               {Math.abs(data.changeValue).toFixed(2)}{" "}
                               <span className="text-[10px] opacity-70">
@@ -1703,15 +1922,27 @@ const HoldingsTable = ({ holdings = [], stockData = {} }) => {
                         )}
                       </td>
 
-                      <td className="p-3 text-right text-gray-700">Rs. {formatNumber(totalCost)}</td>
+                      <td className="p-3 text-right text-gray-700">
+                        Rs. {formatNumber(totalCost)}
+                      </td>
 
-                      <td className="p-3 text-right text-gray-700">Rs. {formatNumber(currentValue)}</td>
+                      <td className="p-3 text-right text-gray-700">
+                        Rs. {formatNumber(currentValue)}
+                      </td>
 
-                      <td className={`p-3 text-right font-semibold ${gainLoss >= 0 ? "text-green-600" : "text-red-600"}`}>
+                      <td
+                        className={`p-3 text-right font-semibold ${
+                          gainLoss >= 0 ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
                         Rs. {formatNumber(gainLoss)}
                       </td>
 
-                      <td className={`p-3 text-right font-semibold ${returnPct >= 0 ? "text-green-600" : "text-red-600"}`}>
+                      <td
+                        className={`p-3 text-right font-semibold ${
+                          returnPct >= 0 ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
                         {formatNumber(returnPct, 2)}%
                       </td>
                     </tr>
@@ -1723,31 +1954,47 @@ const HoldingsTable = ({ holdings = [], stockData = {} }) => {
                           <div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-gray-700 text-sm bg-white border border-gray-100 rounded-xl shadow">
                             <div className="flex items-center gap-1">
                               <BarChart2 className="w-4 h-4 text-indigo-500" />
-                              <span><strong>Open:</strong> Rs. {formatNumber(data.open)}</span>
+                              <span>
+                                <strong>Open:</strong> Rs. {formatNumber(data.open)}
+                              </span>
                             </div>
                             <div className="flex items-center gap-1">
                               <BarChart2 className="w-4 h-4 text-green-600" />
-                              <span><strong>High:</strong> Rs. {formatNumber(data.high)}</span>
+                              <span>
+                                <strong>High:</strong> Rs. {formatNumber(data.high)}
+                              </span>
                             </div>
                             <div className="flex items-center gap-1">
                               <BarChart2 className="w-4 h-4 text-red-600" />
-                              <span><strong>Low:</strong> Rs. {formatNumber(data.low)}</span>
+                              <span>
+                                <strong>Low:</strong> Rs. {formatNumber(data.low)}
+                              </span>
                             </div>
                             <div className="flex items-center gap-1">
                               <BarChart2 className="w-4 h-4 text-indigo-600" />
-                              <span><strong>Volume:</strong> {formatNumber(data.volume, 0)}</span>
+                              <span>
+                                <strong>Volume:</strong> {formatNumber(data.volume, 0)}
+                              </span>
                             </div>
                             <div className="flex items-center gap-1">
                               <BarChart2 className="w-4 h-4 text-indigo-500" />
-                              <span><strong>PE Ratio:</strong> {formatNumber(data.peRatio)}</span>
+                              <span>
+                                <strong>PE Ratio:</strong> {formatNumber(data.peRatio)}
+                              </span>
                             </div>
                             <div className="flex items-center gap-1">
                               <BarChart2 className="w-4 h-4 text-indigo-600" />
-                              <span><strong>52W High:</strong> Rs. {formatNumber(data.high52Week)}</span>
+                              <span>
+                                <strong>52W High:</strong> Rs.{" "}
+                                {formatNumber(data.high52Week)}
+                              </span>
                             </div>
                             <div className="flex items-center gap-1">
                               <BarChart2 className="w-4 h-4 text-indigo-600" />
-                              <span><strong>52W Low:</strong> Rs. {formatNumber(data.low52Week)}</span>
+                              <span>
+                                <strong>52W Low:</strong> Rs.{" "}
+                                {formatNumber(data.low52Week)}
+                              </span>
                             </div>
                           </div>
                         </td>

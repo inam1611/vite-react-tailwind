@@ -166,15 +166,195 @@
 
 // export default PortfolioOverview;
 
-import React, { useMemo } from "react";
+// import React, { useMemo } from "react";
+// import { useAuth } from "../../contexts/authContext";
+// import useTransactions from "../home/hooks/useTransactions";
+// import useHoldings from "../home/hooks/useHoldings";
+// import useStockData from "../home/hooks/useStockData";
+
+// import StockAllocationPie from "./StockAllocationPie";
+// import IndustryAllocationPie from "./IndustryAllocationPie";
+// import DividendBarChart from "./DividendBarChart";
+
+// const PortfolioOverview = () => {
+//   const { currentUser } = useAuth();
+//   const { transactions, selectedPortfolio } = useTransactions(currentUser);
+//   const holdings = useHoldings(transactions, selectedPortfolio);
+//   const { stockData } = useStockData(holdings);
+
+//   // Compute total dividends
+//   const totalDividends = useMemo(() => {
+//     return transactions
+//       .filter((tx) => tx.portfolio === selectedPortfolio && (tx.type || "").toLowerCase() === "dividend")
+//       .reduce((sum, tx) => sum + (Number(tx.quantity) || 0) * (Number(tx.price) || 0), 0);
+//   }, [transactions, selectedPortfolio]);
+
+//   return (
+//     <div className="pt-14 px-6 space-y-8">
+//       <h2 className="text-3xl font-semibold mb-6 text-gray-800">
+//         Portfolio Overview - <span className="text-indigo-600">{selectedPortfolio}</span>
+//       </h2>
+
+//       {/* Total Dividends Summary Card */}
+//       <div className="bg-white rounded-2xl shadow p-6 flex items-center gap-4">
+//         <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+//           <svg className="w-6 h-6 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
+//             <path d="M12 1v22M5 5l14 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+//           </svg>
+//         </div>
+//         <div>
+//           <div className="text-gray-500 text-sm">Total Dividends</div>
+//           <div className="text-xl font-semibold text-amber-600">
+//             Rs. {totalDividends.toLocaleString("en-IN")}
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Charts */}
+//       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+//         <StockAllocationPie holdings={holdings} />
+//         <IndustryAllocationPie holdings={holdings} stockData={stockData} />
+//       </div>
+
+//       {/* Dividends Bar Chart */}
+//       <DividendBarChart
+//         holdings={holdings}
+//         transactions={transactions}
+//         selectedPortfolio={selectedPortfolio}
+//       />
+//     </div>
+//   );
+// };
+
+// export default PortfolioOverview;
+
+// import React from "react";
+// import { useAuth } from "../../contexts/authContext";
+// import useTransactions from "../home/hooks/useTransactions";
+// import useHoldings from "../home/hooks/useHoldings";
+// import useStockData from "../home/hooks/useStockData";
+
+// import StockAllocationPie from "./StockAllocationPie";
+// import IndustryAllocationPie from "./IndustryAllocationPie";
+// import DividendBarChart from "./DividendBarChart";
+// import GainLossBarChart from "./GainLossBarChart";
+// import InvestmentValueAreaChart from "./InvestmentValueAreaChart";
+
+// const PortfolioOverview = () => {
+//   const { currentUser } = useAuth();
+//   const { transactions, selectedPortfolio } = useTransactions(currentUser);
+//   const holdings = useHoldings(transactions, selectedPortfolio);
+//   const { stockData } = useStockData(holdings);
+
+//   return (
+//     <div className="pt-14 px-6 space-y-10">
+//       {/* Heading */}
+//       <div>
+//         <h2 className="text-3xl font-semibold text-gray-800">
+//           Portfolio Overview —{" "}
+//           <span className="text-indigo-600">{selectedPortfolio}</span>
+//         </h2>
+//         <p className="text-gray-500 mt-2">
+//           Visual breakdown of your portfolio, industry exposure, gains, and dividends.
+//         </p>
+//       </div>
+
+//       {/* Pie Charts */}
+//       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+//         <StockAllocationPie holdings={holdings} />
+//         <IndustryAllocationPie holdings={holdings} stockData={stockData} />
+//       </div>
+
+//       {/* Bar Charts */}
+//       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+//         <DividendBarChart
+//           holdings={holdings}
+//           transactions={transactions}
+//           selectedPortfolio={selectedPortfolio}
+//         />
+//         <GainLossBarChart holdings={holdings} stockData={stockData} />
+//       </div>
+
+//       {/* Area Chart */}
+//       <InvestmentValueAreaChart holdings={holdings} stockData={stockData} />
+//     </div>
+//   );
+// };
+
+// export default PortfolioOverview;
+
+// import React from "react";
+// import { useAuth } from "../../contexts/authContext";
+// import useTransactions from "../home/hooks/useTransactions";
+// import useHoldings from "../home/hooks/useHoldings";
+// import useStockData from "../home/hooks/useStockData";
+
+// // Charts
+// import StockAllocationPie from "./StockAllocationPie";
+// import IndustryAllocationPie from "./IndustryAllocationPie";
+// import DividendBarChart from "./DividendBarChart";
+// import GainLossBarChart from "./GainLossBarChart";
+// import InvestmentValueAreaChart from "./InvestmentValueAreaChart";
+
+// const PortfolioOverview = () => {
+//   const { currentUser } = useAuth();
+//   const { transactions, selectedPortfolio } = useTransactions(currentUser);
+//   const holdings = useHoldings(transactions, selectedPortfolio);
+//   const { stockData } = useStockData(holdings);
+
+//   return (
+//     <div className="pt-14 px-6 space-y-10">
+//       {/* ===== Header ===== */}
+//       <div>
+//         <h2 className="text-3xl font-semibold text-gray-800">
+//           Portfolio Overview —{" "}
+//           <span className="text-indigo-600">{selectedPortfolio}</span>
+//         </h2>
+//         <p className="text-gray-500 mt-2">
+//           Visual breakdown of your portfolio performance, allocation, and returns over time.
+//         </p>
+//       </div>
+      
+//       {/* ===== Allocation Charts ===== */}
+//       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+//         <StockAllocationPie holdings={holdings} />
+//         <IndustryAllocationPie holdings={holdings} stockData={stockData} />
+//       </div>
+
+//       {/* ===== Performance Charts ===== */}
+//       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+//         <DividendBarChart
+//           holdings={holdings}
+//           transactions={transactions}
+//           selectedPortfolio={selectedPortfolio}
+//         />
+//         <GainLossBarChart holdings={holdings} stockData={stockData} />
+//       </div>
+
+//       {/* ===== Portfolio Growth (Time-based) ===== */}
+//       <InvestmentValueAreaChart
+//         transactions={transactions}
+//         stockData={stockData}
+//         selectedPortfolio={selectedPortfolio}
+//       />
+//     </div>
+//   );
+// };
+
+// export default PortfolioOverview;
+
+import React from "react";
 import { useAuth } from "../../contexts/authContext";
 import useTransactions from "../home/hooks/useTransactions";
 import useHoldings from "../home/hooks/useHoldings";
 import useStockData from "../home/hooks/useStockData";
 
+// Charts
+import InvestmentValueAreaChart from "./InvestmentValueAreaChart";
 import StockAllocationPie from "./StockAllocationPie";
 import IndustryAllocationPie from "./IndustryAllocationPie";
 import DividendBarChart from "./DividendBarChart";
+import GainLossBarChart from "./GainLossBarChart";
 
 const PortfolioOverview = () => {
   const { currentUser } = useAuth();
@@ -182,46 +362,41 @@ const PortfolioOverview = () => {
   const holdings = useHoldings(transactions, selectedPortfolio);
   const { stockData } = useStockData(holdings);
 
-  // Compute total dividends
-  const totalDividends = useMemo(() => {
-    return transactions
-      .filter((tx) => tx.portfolio === selectedPortfolio && (tx.type || "").toLowerCase() === "dividend")
-      .reduce((sum, tx) => sum + (Number(tx.quantity) || 0) * (Number(tx.price) || 0), 0);
-  }, [transactions, selectedPortfolio]);
-
   return (
-    <div className="pt-14 px-6 space-y-8">
-      <h2 className="text-3xl font-semibold mb-6 text-gray-800">
-        Portfolio Overview - <span className="text-indigo-600">{selectedPortfolio}</span>
-      </h2>
-
-      {/* Total Dividends Summary Card */}
-      <div className="bg-white rounded-2xl shadow p-6 flex items-center gap-4">
-        <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
-          <svg className="w-6 h-6 text-amber-600" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 1v22M5 5l14 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </div>
-        <div>
-          <div className="text-gray-500 text-sm">Total Dividends</div>
-          <div className="text-xl font-semibold text-amber-600">
-            Rs. {totalDividends.toLocaleString("en-IN")}
-          </div>
-        </div>
+    <div className="pt-14 px-6 space-y-10">
+      {/* ===== Header ===== */}
+      <div>
+        <h2 className="text-3xl font-semibold text-gray-800">
+          Portfolio Overview —{" "}
+          <span className="text-indigo-600">{selectedPortfolio}</span>
+        </h2>
+        <p className="text-gray-500 mt-2">
+          Visual breakdown of your portfolio performance, allocation, and returns over time.
+        </p>
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* ===== Portfolio Growth (Time-based) ===== */}
+      <InvestmentValueAreaChart
+        transactions={transactions}
+        stockData={stockData}
+        selectedPortfolio={selectedPortfolio}
+      />
+
+      {/* ===== Allocation Charts ===== */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <StockAllocationPie holdings={holdings} />
         <IndustryAllocationPie holdings={holdings} stockData={stockData} />
       </div>
 
-      {/* Dividends Bar Chart */}
-      <DividendBarChart
-        holdings={holdings}
-        transactions={transactions}
-        selectedPortfolio={selectedPortfolio}
-      />
+      {/* ===== Performance Charts ===== */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <DividendBarChart
+          holdings={holdings}
+          transactions={transactions}
+          selectedPortfolio={selectedPortfolio}
+        />
+        <GainLossBarChart holdings={holdings} stockData={stockData} />
+      </div>
     </div>
   );
 };
