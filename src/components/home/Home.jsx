@@ -1345,15 +1345,8 @@ const Home = () => {
     <div className="pt-14 px-6">
       {/* ===== Welcome ===== */}
       <div className="flex items-center gap-3 mb-6">
-        {userData?.avatar && (
-          <img
-            src={userData.avatar}
-            alt="Avatar"
-            className="w-10 h-10 rounded-full border-2 border-indigo-500"
-          />
-        )}
         <div className="text-3xl font-semibold text-gray-800">
-          Welcome, <span className="text-indigo-600">{userData?.displayName || "User"}</span>
+          Welcome <span className="text-indigo-600">{userData?.displayName || "User"}</span>
         </div>
       </div>
 
