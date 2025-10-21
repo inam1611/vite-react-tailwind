@@ -1220,28 +1220,169 @@
 // export default Transactions;
 
 
+// // src/components/transactions/Transactions.jsx
+// import React, { useState } from "react";
+// import { Toaster } from "react-hot-toast";
+// import { useTransactionsData } from "./useTransactionsData";
+// import { addPortfolio, deletePortfolio } from "./portfolioUtils";
+// import { addTransaction, deleteTransaction } from "./transactionUtils";
+// import PortfolioManager from "./PortfolioManager";
+// import TransactionForm from "./TransactionForm";
+// import TransactionTable from "./TransactionTable";
+
+// const Transactions = () => {
+//   const {
+//     user,
+//     portfolios,
+//     setPortfolios,
+//     selectedPortfolio,
+//     setSelectedPortfolio,
+//     transactions,
+//     setTransactions,
+//     loading,
+//     syncToFirestore,
+//   } = useTransactionsData();
+
+//   const [newTransaction, setNewTransaction] = useState({
+//     symbol: "",
+//     type: "buy",
+//     quantity: "",
+//     price: "",
+//     date: "",
+//   });
+//   const [newPortfolioName, setNewPortfolioName] = useState("");
+
+//   if (loading)
+//   return (
+//     <div className="flex justify-center items-center min-h-[calc(100vh-4rem)]">
+//       <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+//     </div>
+//   );
+
+
+//   if (!user)
+//     return (
+//       <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] text-gray-700 text-lg bg-gray-100">
+//         Please log in to view your transactions.
+//       </div>
+//     );
+
+//   const filteredTransactions = transactions.filter(
+//     (tx) => tx.portfolio === selectedPortfolio
+//   );
+
+//   const totalValue = filteredTransactions.reduce((sum, tx) => {
+//     const value =
+//       tx.type === "buy"
+//         ? tx.quantity * tx.price
+//         : tx.type === "sell"
+//         ? -tx.quantity * tx.price
+//         : 0;
+//     return sum + value;
+//   }, 0);
+
+//   return (
+//     <div className="min-h-[calc(100vh-4rem)] bg-gray-100 p-8 overflow-y-auto transition-all duration-300">
+//       <Toaster position="top-right" />
+//       <div className="space-y-8">
+//         <h1 className="text-3xl font-bold text-gray-800">Transactions</h1>
+
+//         <PortfolioManager
+//           portfolios={portfolios}
+//           selectedPortfolio={selectedPortfolio}
+//           setSelectedPortfolio={setSelectedPortfolio}
+//           newPortfolioName={newPortfolioName}
+//           setNewPortfolioName={setNewPortfolioName}
+//           handleAddPortfolio={() =>
+//             addPortfolio(
+//               newPortfolioName,
+//               portfolios,
+//               transactions,
+//               selectedPortfolio,
+//               syncToFirestore,
+//               setPortfolios,
+//               setSelectedPortfolio,
+//               setNewPortfolioName
+//             )
+//           }
+//           handleDeletePortfolio={(name) =>
+//             deletePortfolio(
+//               name,
+//               portfolios,
+//               selectedPortfolio,
+//               transactions,
+//               syncToFirestore,
+//               setPortfolios,
+//               setTransactions,
+//               setSelectedPortfolio
+//             )
+//           }
+//         />
+
+//         <TransactionForm
+//           newTransaction={newTransaction}
+//           setNewTransaction={setNewTransaction}
+//           handleAddTransaction={(e) =>
+//             addTransaction(
+//               e,
+//               newTransaction,
+//               selectedPortfolio,
+//               portfolios,
+//               transactions,
+//               setTransactions,
+//               setNewTransaction,
+//               syncToFirestore
+//             )
+//           }
+//         />
+
+//         <TransactionTable
+//           filteredTransactions={filteredTransactions}
+//           handleDeleteTransaction={(id) =>
+//             deleteTransaction(
+//               id,
+//               portfolios,
+//               selectedPortfolio,
+//               transactions,
+//               setTransactions,
+//               syncToFirestore
+//             )
+//           }
+//           totalValue={totalValue}
+//         />
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Transactions;
+
 // src/components/transactions/Transactions.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
+import { useAuth } from "../../contexts/authContext";
+import { usePortfolioContext } from "../../contexts/PortfolioContext"; // ✅ global portfolio
 import { useTransactionsData } from "./useTransactionsData";
 import { addPortfolio, deletePortfolio } from "./portfolioUtils";
 import { addTransaction, deleteTransaction } from "./transactionUtils";
+
 import PortfolioManager from "./PortfolioManager";
 import TransactionForm from "./TransactionForm";
 import TransactionTable from "./TransactionTable";
 
 const Transactions = () => {
+  const { currentUser } = useAuth(); // ✅ Correct source of truth
+  const { activePortfolio, setActivePortfolio } = usePortfolioContext(); // ✅ Global portfolio state
+
+  // ✅ Hook will internally use currentUser or Firestore
   const {
-    user,
     portfolios,
     setPortfolios,
-    selectedPortfolio,
-    setSelectedPortfolio,
     transactions,
     setTransactions,
     loading,
     syncToFirestore,
-  } = useTransactionsData();
+  } = useTransactionsData(currentUser);
 
   const [newTransaction, setNewTransaction] = useState({
     symbol: "",
@@ -1252,23 +1393,36 @@ const Transactions = () => {
   });
   const [newPortfolioName, setNewPortfolioName] = useState("");
 
+  // ✅ Keep activePortfolio synced with available portfolios
+  useEffect(() => {
+    if (
+      activePortfolio &&
+      portfolios.length > 0 &&
+      !portfolios.includes(activePortfolio)
+    ) {
+      setActivePortfolio(portfolios[0]);
+    }
+  }, [portfolios, activePortfolio, setActivePortfolio]);
+
+  // ✅ Proper loading UI
   if (loading)
-  return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-4rem)]">
-      <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-    </div>
-  );
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-4rem)]">
+        <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
 
-
-  if (!user)
+  // ✅ If still not logged in
+  if (!currentUser)
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] text-gray-700 text-lg bg-gray-100">
         Please log in to view your transactions.
       </div>
     );
 
+  // ✅ Filter based on global activePortfolio
   const filteredTransactions = transactions.filter(
-    (tx) => tx.portfolio === selectedPortfolio
+    (tx) => tx.portfolio === activePortfolio
   );
 
   const totalValue = filteredTransactions.reduce((sum, tx) => {
@@ -1289,8 +1443,8 @@ const Transactions = () => {
 
         <PortfolioManager
           portfolios={portfolios}
-          selectedPortfolio={selectedPortfolio}
-          setSelectedPortfolio={setSelectedPortfolio}
+          selectedPortfolio={activePortfolio}
+          setSelectedPortfolio={setActivePortfolio} // ✅ global setter
           newPortfolioName={newPortfolioName}
           setNewPortfolioName={setNewPortfolioName}
           handleAddPortfolio={() =>
@@ -1298,10 +1452,10 @@ const Transactions = () => {
               newPortfolioName,
               portfolios,
               transactions,
-              selectedPortfolio,
+              activePortfolio,
               syncToFirestore,
               setPortfolios,
-              setSelectedPortfolio,
+              setActivePortfolio,
               setNewPortfolioName
             )
           }
@@ -1309,12 +1463,12 @@ const Transactions = () => {
             deletePortfolio(
               name,
               portfolios,
-              selectedPortfolio,
+              activePortfolio,
               transactions,
               syncToFirestore,
               setPortfolios,
               setTransactions,
-              setSelectedPortfolio
+              setActivePortfolio
             )
           }
         />
@@ -1326,7 +1480,7 @@ const Transactions = () => {
             addTransaction(
               e,
               newTransaction,
-              selectedPortfolio,
+              activePortfolio,
               portfolios,
               transactions,
               setTransactions,
@@ -1342,7 +1496,7 @@ const Transactions = () => {
             deleteTransaction(
               id,
               portfolios,
-              selectedPortfolio,
+              activePortfolio,
               transactions,
               setTransactions,
               syncToFirestore
