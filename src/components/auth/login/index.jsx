@@ -9,7 +9,8 @@ const Login = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [isSigningIn, setIsSigningIn] = useState(false)
-    const [errorMessage, setErrorMessage] = useState('')
+    // const [errorMessage, setErrorMessage] = useState('')
+    const [errorMessage] = useState(""); // if you only use the value
 
     const onSubmit = async (e) => {
         e.preventDefault()

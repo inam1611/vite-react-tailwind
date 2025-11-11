@@ -136,7 +136,7 @@
 
 // export default PortfolioManager;
 
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db, auth } from "../../firebase/firebase";
 import { usePortfolioContext } from "../../contexts/PortfolioContext";

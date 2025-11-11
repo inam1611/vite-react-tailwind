@@ -23,6 +23,42 @@
 //   );
 // }
 
+// import React, { useEffect, useState } from "react";
+
+// export default function LastUpdated({ date }) {
+//   const [highlight, setHighlight] = useState(false);
+//   const [formattedTime, setFormattedTime] = useState("");
+
+//   useEffect(() => {
+//     if (!date) return;
+
+//     setFormattedTime(date.toLocaleTimeString());
+//     setHighlight(true);
+
+//     const timer = setTimeout(() => setHighlight(false), 2000);
+//     return () => clearTimeout(timer);
+//   }, [date]);
+
+//   if (!date) return null;
+
+//   return (
+//     <p
+//       className={`text-sm mt-2 transition-colors duration-700 ${
+//         highlight ? "text-indigo-600 font-medium" : "text-gray-500"
+//       }`}
+//     >
+//       Last Updated:{" "}
+//       <span
+//         className={`transition-colors duration-700 ${
+//           highlight ? "text-indigo-700" : "text-gray-700"
+//         }`}
+//       >
+//         {formattedTime}
+//       </span>
+//     </p>
+//   );
+// }
+
 import React, { useEffect, useState } from "react";
 
 export default function LastUpdated({ date }) {
@@ -32,7 +68,16 @@ export default function LastUpdated({ date }) {
   useEffect(() => {
     if (!date) return;
 
-    setFormattedTime(date.toLocaleTimeString());
+    const options = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    };
+
+    setFormattedTime(date.toLocaleString(undefined, options));
     setHighlight(true);
 
     const timer = setTimeout(() => setHighlight(false), 2000);
