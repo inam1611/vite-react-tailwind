@@ -1586,6 +1586,131 @@
 
 // export default Home;
 
+// // src/components/home/Home.jsx
+// import React, { useState, useEffect } from "react";
+// import { useAuth } from "../../contexts/authContext";
+// import { usePortfolioContext } from "../../contexts/PortfolioContext";
+// import { db } from "../../firebase/firebase";
+// import { doc, getDoc } from "firebase/firestore";
+// import useTransactions from "./hooks/useTransactions";
+// import useHoldings from "./hooks/useHoldings";
+// import useStockData from "./hooks/useStockData";
+// import useSummary from "./hooks/useSummary";
+// import DashboardCards from "./DashboardCards";
+// import HoldingsTable from "./HoldingsTable";
+// import LastUpdated from "./LastUpdated";
+// import HistorySummary from "./HistorySummary";
+// import PortfolioOverview from "../portfolio/PortfolioOverview";
+
+// const Home = () => {
+//   const { currentUser } = useAuth();
+//   const { activePortfolio } = usePortfolioContext();
+//   const [userData, setUserData] = useState(null);
+//   const [totals, setTotals] = useState({
+//     realizedGain: 0,
+//     realizedReturn: 0,
+//     totalDividends: 0,
+//   });
+
+//   // ✅ Hooks
+//   const { transactions, loading: txLoading } = useTransactions(currentUser, activePortfolio);
+//   const holdings = useHoldings(transactions, activePortfolio);
+//   const { stockData, lastUpdated } = useStockData(holdings);
+//   const summary = useSummary(holdings, stockData);
+
+//   // ✅ Fetch user info (name, avatar)
+//   useEffect(() => {
+//     const fetchUserData = async () => {
+//       if (!currentUser) return;
+//       const ref = doc(db, "users", currentUser.uid);
+//       const snap = await getDoc(ref);
+//       if (snap.exists()) setUserData(snap.data());
+//     };
+//     fetchUserData();
+//   }, [currentUser]);
+
+//   // ✅ Loading spinner
+//   if (txLoading)
+//     return (
+//       <div className="flex justify-center items-center min-h-[calc(100vh-4rem)]">
+//         <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+//       </div>
+//     );
+
+//   const dashboardSummary = {
+//     ...summary,
+//     realizedGain: totals.realizedGain,
+//     realizedReturn: totals.realizedReturn,
+//     totalDividends: totals.totalDividends,
+//   };
+
+//   return (
+//     <div className="pt-14 px-4 sm:px-6 md:px-8 lg:px-12">
+//       {/* ===== Welcome Section ===== */}
+//       <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3 mb-6">
+//         <div className="text-2xl sm:text-3xl font-semibold text-gray-800 break-words">
+//           Welcome{" "}
+//           <span className="text-indigo-600">{userData?.displayName || "User"}</span>
+//         </div>
+//       </div>
+
+//       {/* ===== Active Portfolio Display ===== */}
+//       <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base break-words">
+//         Showing holdings for:{" "}
+//         <span className="font-semibold text-indigo-700 break-words">{activePortfolio}</span>
+//       </p>
+
+//       {/* ===== Dashboard Cards ===== */}
+//       <DashboardCards summary={dashboardSummary} />
+
+//       {/* ===== Holdings Table ===== */}
+//       <div className="mt-6 overflow-x-auto">
+//         <table className="min-w-full divide-y divide-gray-200">
+//           <HoldingsTable holdings={holdings} stockData={stockData}  />
+//         </table>
+//       </div>
+
+//       {/* ===== Mobile Card View for Holdings ===== */}
+//       <div className="sm:hidden mt-4 space-y-2">
+//         {holdings.map((h) => (
+//           <div key={h.symbol} className="p-3 bg-white shadow rounded-lg">
+//             <div className="flex justify-between items-center">
+//               <span className="font-semibold text-gray-800">{h.symbol}</span>
+//               <span className="text-sm text-gray-500">{stockData[h.symbol]?.price || "-"}</span>
+//             </div>
+//             <div className="mt-1 text-sm text-gray-600">
+//               Shares: {h.shares} <br />
+//               Value: {stockData[h.symbol]?.value || "-"} <br />
+//               Avg. Cost: {h.avgCost || "-"}
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+
+//       {/* ===== Last Updated ===== */}
+//       <div className="mt-4 px-2 sm:px-0">
+//         <LastUpdated date={lastUpdated} />
+//       </div>
+
+//       {/* ===== History Summary (Realized Gain/Return) ===== */}
+//       <div className="mt-6 px-2 sm:px-0">
+//         <HistorySummary
+//           transactions={transactions}
+//           selectedPortfolio={activePortfolio}
+//           onTotalsComputed={setTotals}
+//         />
+//       </div>
+
+//       {/* ===== Optional Portfolio Overview ===== */}
+//       <div className="mt-8 px-2 sm:px-0">
+//         <PortfolioOverview />
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Home;
+
 // src/components/home/Home.jsx
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/authContext";
@@ -1615,7 +1740,7 @@ const Home = () => {
   // ✅ Hooks
   const { transactions, loading: txLoading } = useTransactions(currentUser, activePortfolio);
   const holdings = useHoldings(transactions, activePortfolio);
-  const { stockData, lastUpdated } = useStockData(holdings);
+  const { stockData, lastUpdated, manualRefresh } = useStockData(holdings); // ✅ added manualRefresh
   const summary = useSummary(holdings, stockData);
 
   // ✅ Fetch user info (name, avatar)
@@ -1665,9 +1790,11 @@ const Home = () => {
 
       {/* ===== Holdings Table ===== */}
       <div className="mt-6 overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <HoldingsTable holdings={holdings} stockData={stockData} />
-        </table>
+        <HoldingsTable 
+          holdings={holdings} 
+          stockData={stockData} 
+          manualRefresh={manualRefresh} // ✅ pass manual refresh
+        />
       </div>
 
       {/* ===== Mobile Card View for Holdings ===== */}
@@ -1676,11 +1803,11 @@ const Home = () => {
           <div key={h.symbol} className="p-3 bg-white shadow rounded-lg">
             <div className="flex justify-between items-center">
               <span className="font-semibold text-gray-800">{h.symbol}</span>
-              <span className="text-sm text-gray-500">{stockData[h.symbol]?.price || "-"}</span>
+              <span className="text-sm text-gray-500">{stockData[h.symbol]?.currentPrice || "-"}</span>
             </div>
             <div className="mt-1 text-sm text-gray-600">
-              Shares: {h.shares} <br />
-              Value: {stockData[h.symbol]?.value || "-"} <br />
+              Shares: {h.quantity || "-"} <br />
+              Value: {stockData[h.symbol]?.currentPrice ? (stockData[h.symbol].currentPrice * h.quantity).toLocaleString("en-IN") : "-"} <br />
               Avg. Cost: {h.avgCost || "-"}
             </div>
           </div>
