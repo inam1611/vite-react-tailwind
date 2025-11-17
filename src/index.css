@@ -14,7 +14,7 @@
 
 
 /* ✅ Force Light Theme (Always light regardless of system) */
-:root {
+/* :root {
   color-scheme: light !important;
   background-color: #ffffff !important;
   color: #000000 !important;
@@ -32,7 +32,7 @@ html, body {
 html.dark, body.dark {
   background-color: #ffffff !important;
   color: #000000 !important;
-}
+} */
 
 /* Tailwind layers */
 @tailwind base;

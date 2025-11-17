@@ -1725,7 +1725,6 @@ import DashboardCards from "./DashboardCards";
 import HoldingsTable from "./HoldingsTable";
 import LastUpdated from "./LastUpdated";
 import HistorySummary from "./HistorySummary";
-import PortfolioOverview from "../portfolio/PortfolioOverview";
 
 const Home = () => {
   const { currentUser } = useAuth();
@@ -1826,11 +1825,6 @@ const Home = () => {
           selectedPortfolio={activePortfolio}
           onTotalsComputed={setTotals}
         />
-      </div>
-
-      {/* ===== Optional Portfolio Overview ===== */}
-      <div className="mt-8 px-2 sm:px-0">
-        <PortfolioOverview />
       </div>
     </div>
   );

@@ -517,7 +517,7 @@ function App() {
         {/* ✅ Include SpeedInsights for performance monitoring */}
         <SpeedInsights projectId="YOUR_PROJECT_ID" />
 
-        <div className="w-full h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors">
+        <div className="w-full h-screen flex flex-col bg-gray-50 transition-colors">
           <AppRoutes />
         </div>
       </PortfolioProvider>
