@@ -459,7 +459,7 @@ import { Navigate, useRoutes } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/authContext";
 import { PortfolioProvider } from "./contexts/PortfolioContext";
 import { SpeedInsights } from "@vercel/speed-insights/react"; // ✅ import component
-
+import { Analytics } from "@vercel/analytics/react"
 import Login from "./components/auth/login";
 import Register from "./components/auth/register";
 import Home from "./components/home/Home";
@@ -516,7 +516,7 @@ function App() {
       <PortfolioProvider>
         {/* ✅ Include SpeedInsights for performance monitoring */}
         <SpeedInsights projectId="YOUR_PROJECT_ID" />
-
+        <Analytics />
         <div className="w-full h-screen flex flex-col bg-gray-50 transition-colors">
           <AppRoutes />
         </div>
