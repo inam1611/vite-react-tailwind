@@ -740,6 +740,168 @@
 //   return { stockData, lastUpdated };
 // }
 
+// import { useState, useEffect, useCallback } from "react";
+// import { db } from "../../../firebase/firebase";
+// import { doc, getDoc, setDoc } from "firebase/firestore";
+
+// const REFRESH_INTERVAL = 30 * 60 * 1000; 
+// const CACHE_KEY = "stockDataCache";
+
+// export default function useStockData(holdings, refreshInterval = REFRESH_INTERVAL) {
+//   const [stockData, setStockData] = useState({});
+//   const [lastUpdated, setLastUpdated] = useState(null);
+
+//   // Load cache on mount
+//   useEffect(() => {
+//     const cached = localStorage.getItem(CACHE_KEY);
+//     if (cached) {
+//       const parsed = JSON.parse(cached);
+//       setStockData(parsed.data || {});
+//       setLastUpdated(parsed.lastUpdated ? new Date(parsed.lastUpdated) : null);
+//     }
+//   }, []);
+
+//   const getMarketTimes = useCallback(() => {
+//     const now = new Date();
+//     const day = now.getDay(); // 0=Sun, 6=Sat
+//     if (day === 0 || day === 6) return null;
+
+//     const marketStart = new Date(now);
+//     marketStart.setHours(9, 31, 0, 0);
+
+//     const marketEnd = new Date(now);
+//     if (day >= 1 && day <= 4) marketEnd.setHours(15, 35, 0, 0);
+//     else if (day === 5) marketEnd.setHours(16, 5, 0, 0);
+
+//     return { marketStart, marketEnd };
+//   }, []);
+
+//   const isMarketOpen = useCallback(() => {
+//     const times = getMarketTimes();
+//     if (!times) return false;
+//     const now = new Date();
+//     return now >= times.marketStart && now <= times.marketEnd;
+//   }, [getMarketTimes]);
+
+//   const fetchStockData = useCallback(async () => {
+//     if (!holdings || holdings.length === 0) return;
+
+//     const results = {};
+//     let fetchedAny = false;
+
+//     await Promise.all(
+//       holdings.map(async (h) => {
+//         const symbol = h.symbol;
+//         if (!symbol) return;
+
+//         const stockRef = doc(db, "globalStocks", symbol);
+//         const stockSnap = await getDoc(stockRef);
+
+//         let name = null;
+//         let industry = null;
+
+//         if (stockSnap.exists()) {
+//           const stockDoc = stockSnap.data();
+//           name = stockDoc.name;
+//           industry = stockDoc.industry;
+//         } else {
+//           try {
+//             const res = await fetch(
+//               `https://psx-api-zxcv.onrender.com/api/stock-info/${symbol}`
+//             );
+//             if (!res.ok) return;
+//             const data = await res.json();
+//             if (!data?.ticker) return;
+
+//             name = data.name || symbol;
+//             industry = data.industry || "—";
+//             await setDoc(stockRef, { name, industry }, { merge: true });
+//           } catch {}
+//         }
+
+//         // Always fetch live data
+//         try {
+//           const res = await fetch(
+//             `https://psx-api-zxcv.onrender.com/api/stock-info/${symbol}`
+//           );
+//           if (!res.ok) return;
+//           const data = await res.json();
+//           if (!data?.ticker) return;
+
+//           fetchedAny = true;
+
+//           results[symbol] = {
+//             name,
+//             industry,
+//             currentPrice: data.closingPrice || 0,
+//             open: data.open || 0,
+//             high: data.high || 0,
+//             low: data.low || 0,
+//             volume: data.volume || 0,
+//             peRatio: data.peRatio || 0,
+//             high52Week: data.high52Week || 0,
+//             low52Week: data.low52Week || 0,
+//             changeValue: data.changeValue || 0,
+//             changePercent: data.changePercent || "(0%)",
+//           };
+//         } catch {}
+//       })
+//     );
+
+//     if (fetchedAny) {
+//       const now = new Date();
+//       setStockData(results);
+//       setLastUpdated(now);
+//       localStorage.setItem(CACHE_KEY, JSON.stringify({ data: results, lastUpdated: now }));
+//     }
+//   }, [holdings]);
+
+//   const manualRefresh = useCallback(() => {
+//     fetchStockData();
+//   }, [fetchStockData]);
+
+//   useEffect(() => {
+//     if (!holdings || holdings.length === 0) return;
+
+//     const cached = localStorage.getItem(CACHE_KEY);
+//     const hasCache = cached && JSON.parse(cached).data;
+//     const shouldFetchNow = isMarketOpen() || !hasCache;
+
+//     if (shouldFetchNow) {
+//       fetchStockData();
+//     }
+
+//     let interval = null;
+//     let timeout = null;
+
+//     const scheduleFetch = () => {
+//       const times = getMarketTimes();
+//       if (!times) return;
+
+//       const now = new Date();
+//       if (now < times.marketStart) {
+//         timeout = setTimeout(() => {
+//           fetchStockData();
+//           interval = setInterval(fetchStockData, refreshInterval);
+//         }, times.marketStart - now);
+//       } else if (now >= times.marketStart && now <= times.marketEnd) {
+//         fetchStockData();
+//         interval = setInterval(fetchStockData, refreshInterval);
+//         timeout = setTimeout(() => clearInterval(interval), times.marketEnd - now);
+//       }
+//     };
+
+//     scheduleFetch();
+
+//     return () => {
+//       if (interval) clearInterval(interval);
+//       if (timeout) clearTimeout(timeout);
+//     };
+//   }, [fetchStockData, holdings, refreshInterval, isMarketOpen, getMarketTimes]);
+
+//   return { stockData, lastUpdated, manualRefresh };
+// }
+
 import { useState, useEffect, useCallback } from "react";
 import { db } from "../../../firebase/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -751,7 +913,7 @@ export default function useStockData(holdings, refreshInterval = REFRESH_INTERVA
   const [stockData, setStockData] = useState({});
   const [lastUpdated, setLastUpdated] = useState(null);
 
-  // Load cache on mount
+  // Load cached stockData from localStorage
   useEffect(() => {
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
@@ -799,31 +961,41 @@ export default function useStockData(holdings, refreshInterval = REFRESH_INTERVA
 
         let name = null;
         let industry = null;
+        let needUpdate = true;
 
         if (stockSnap.exists()) {
           const stockDoc = stockSnap.data();
           name = stockDoc.name;
           industry = stockDoc.industry;
-        } else {
+
+          // Check lastUpdated for 24h
+          const lastUpdated = stockDoc.lastUpdated?.toDate?.() || new Date(stockDoc.lastUpdated || 0);
+          if (new Date() - lastUpdated < 24 * 60 * 60 * 1000) {
+            needUpdate = false; // don't update if < 24h
+          }
+        }
+
+        // Fetch metadata if needed
+        if (!stockSnap.exists() || needUpdate) {
           try {
-            const res = await fetch(
-              `https://psx-api-zxcv.onrender.com/api/stock-info/${symbol}`
-            );
+            const res = await fetch(`https://psx-api-zxcv.onrender.com/api/stock-info/${symbol}`);
             if (!res.ok) return;
             const data = await res.json();
             if (!data?.ticker) return;
 
             name = data.name || symbol;
             industry = data.industry || "—";
-            await setDoc(stockRef, { name, industry }, { merge: true });
-          } catch {}
+
+            // Update Firestore metadata with timestamp
+            await setDoc(stockRef, { name, industry, lastUpdated: new Date() }, { merge: true });
+          } catch (err) {
+            console.error("Error fetching stock metadata:", err);
+          }
         }
 
-        // Always fetch live data
+        // Always fetch live stock price
         try {
-          const res = await fetch(
-            `https://psx-api-zxcv.onrender.com/api/stock-info/${symbol}`
-          );
+          const res = await fetch(`https://psx-api-zxcv.onrender.com/api/stock-info/${symbol}`);
           if (!res.ok) return;
           const data = await res.json();
           if (!data?.ticker) return;
@@ -844,7 +1016,9 @@ export default function useStockData(holdings, refreshInterval = REFRESH_INTERVA
             changeValue: data.changeValue || 0,
             changePercent: data.changePercent || "(0%)",
           };
-        } catch {}
+        } catch (err) {
+          console.error("Error fetching stock price:", err);
+        }
       })
     );
 
@@ -860,6 +1034,7 @@ export default function useStockData(holdings, refreshInterval = REFRESH_INTERVA
     fetchStockData();
   }, [fetchStockData]);
 
+  // Schedule periodic fetch according to market times
   useEffect(() => {
     if (!holdings || holdings.length === 0) return;
 
@@ -867,9 +1042,7 @@ export default function useStockData(holdings, refreshInterval = REFRESH_INTERVA
     const hasCache = cached && JSON.parse(cached).data;
     const shouldFetchNow = isMarketOpen() || !hasCache;
 
-    if (shouldFetchNow) {
-      fetchStockData();
-    }
+    if (shouldFetchNow) fetchStockData();
 
     let interval = null;
     let timeout = null;

@@ -1053,15 +1053,28 @@ const HistorySummary = ({ transactions = [], selectedPortfolio, onTotalsComputed
           </span>
         </div>
 
-        <div className="text-lg font-medium text-gray-700 mt-2 sm:mt-0 flex items-center gap-2">
-          <Coins className="w-5 h-5 text-amber-600" />
-          Total Dividends:
-          <span className="ml-1 font-semibold text-amber-600">
-            Rs. {totals.totalDividends.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-          </span>
-        </div>
-      </div>
+        <div className="text-lg font-medium text-gray-700 mt-2 sm:mt-0 flex flex-col sm:flex-row gap-2">
+          <div className="flex items-center gap-2">
+            <Coins className="w-5 h-5 text-amber-600" />
+            Total Dividends:
+            <span className="ml-1 font-semibold text-amber-600">
+              Rs. {totals.totalDividends.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            </span>
+          </div>
 
+          <div className="flex items-center gap-2">
+            <Coins className="w-5 h-5 text-indigo-500" />
+            Avg Dividend per Year:
+            <span className="ml-1 font-semibold text-indigo-500">
+              Rs. {(
+                yearList.length > 0
+                  ? totals.totalDividends / yearList.length
+                  : 0
+              ).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+            </span>
+          </div>
+        </div>
+      </div> 
       {yearList.map(({ fy, entries, totalSellAmount, totalDividends }) => {
         const open = !!expandedFY[fy];
         return (

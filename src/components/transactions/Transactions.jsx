@@ -1357,11 +1357,164 @@
 
 // export default Transactions;
 
-// src/components/transactions/Transactions.jsx
+// // src/components/transactions/Transactions.jsx
+// import React, { useState, useEffect } from "react";
+// import { Toaster } from "react-hot-toast";
+// import { useAuth } from "../../contexts/authContext";
+// import { usePortfolioContext } from "../../contexts/PortfolioContext"; // ✅ global portfolio
+// import { useTransactionsData } from "./useTransactionsData";
+// import { addPortfolio, deletePortfolio } from "./portfolioUtils";
+// import { addTransaction, deleteTransaction } from "./transactionUtils";
+
+// import PortfolioManager from "./PortfolioManager";
+// import TransactionForm from "./TransactionForm";
+// import TransactionTable from "./TransactionTable";
+
+// const Transactions = () => {
+//   const { currentUser } = useAuth(); // ✅ Correct source of truth
+//   const { activePortfolio, setActivePortfolio } = usePortfolioContext(); // ✅ Global portfolio state
+
+//   // ✅ Hook will internally use currentUser or Firestore
+//   const {
+//     portfolios,
+//     setPortfolios,
+//     transactions,
+//     setTransactions,
+//     loading,
+//     syncToFirestore,
+//   } = useTransactionsData(currentUser);
+
+//   const [newTransaction, setNewTransaction] = useState({
+//     symbol: "",
+//     type: "buy",
+//     quantity: "",
+//     price: "",
+//     date: "",
+//   });
+//   const [newPortfolioName, setNewPortfolioName] = useState("");
+
+//   // ✅ Keep activePortfolio synced with available portfolios
+//   useEffect(() => {
+//     if (
+//       activePortfolio &&
+//       portfolios.length > 0 &&
+//       !portfolios.includes(activePortfolio)
+//     ) {
+//       setActivePortfolio(portfolios[0]);
+//     }
+//   }, [portfolios, activePortfolio, setActivePortfolio]);
+
+//   // ✅ Proper loading UI
+//   if (loading)
+//     return (
+//       <div className="flex justify-center items-center min-h-[calc(100vh-4rem)]">
+//         <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+//       </div>
+//     );
+
+//   // ✅ If still not logged in
+//   if (!currentUser)
+//     return (
+//       <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] text-gray-700 text-lg bg-gray-100">
+//         Please log in to view your transactions.
+//       </div>
+//     );
+
+//   // ✅ Filter based on global activePortfolio
+//   const filteredTransactions = transactions.filter(
+//     (tx) => tx.portfolio === activePortfolio
+//   );
+
+//   const totalValue = filteredTransactions.reduce((sum, tx) => {
+//     const value =
+//       tx.type === "buy"
+//         ? tx.quantity * tx.price
+//         : tx.type === "sell"
+//         ? -tx.quantity * tx.price
+//         : 0;
+//     return sum + value;
+//   }, 0);
+
+//   return (
+//     <div className="min-h-[calc(100vh-4rem)] bg-gray-100 p-8 overflow-y-auto transition-all duration-300">
+//       <Toaster position="top-right" />
+//       <div className="space-y-8">
+//         <h1 className="text-3xl font-bold text-gray-800">Transactions</h1>
+
+//         <PortfolioManager
+//           portfolios={portfolios}
+//           selectedPortfolio={activePortfolio}
+//           setSelectedPortfolio={setActivePortfolio} // ✅ global setter
+//           newPortfolioName={newPortfolioName}
+//           setNewPortfolioName={setNewPortfolioName}
+//           handleAddPortfolio={() =>
+//             addPortfolio(
+//               newPortfolioName,
+//               portfolios,
+//               transactions,
+//               activePortfolio,
+//               syncToFirestore,
+//               setPortfolios,
+//               setActivePortfolio,
+//               setNewPortfolioName
+//             )
+//           }
+//           handleDeletePortfolio={(name) =>
+//             deletePortfolio(
+//               name,
+//               portfolios,
+//               activePortfolio,
+//               transactions,
+//               syncToFirestore,
+//               setPortfolios,
+//               setTransactions,
+//               setActivePortfolio
+//             )
+//           }
+//         />
+
+//         <TransactionForm
+//           newTransaction={newTransaction}
+//           setNewTransaction={setNewTransaction}
+//           handleAddTransaction={(e) =>
+//             addTransaction(
+//               e,
+//               newTransaction,
+//               activePortfolio,
+//               portfolios,
+//               transactions,
+//               setTransactions,
+//               setNewTransaction,
+//               syncToFirestore
+//             )
+//           }
+//         />
+
+//         <TransactionTable
+//           filteredTransactions={filteredTransactions}
+//           handleDeleteTransaction={(id) =>
+//             deleteTransaction(
+//               id,
+//               portfolios,
+//               activePortfolio,
+//               transactions,
+//               setTransactions,
+//               syncToFirestore
+//             )
+//           }
+//           totalValue={totalValue}
+//         />
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Transactions;
+
 import React, { useState, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { useAuth } from "../../contexts/authContext";
-import { usePortfolioContext } from "../../contexts/PortfolioContext"; // ✅ global portfolio
+import { usePortfolioContext } from "../../contexts/PortfolioContext"; 
 import { useTransactionsData } from "./useTransactionsData";
 import { addPortfolio, deletePortfolio } from "./portfolioUtils";
 import { addTransaction, deleteTransaction } from "./transactionUtils";
@@ -1371,10 +1524,9 @@ import TransactionForm from "./TransactionForm";
 import TransactionTable from "./TransactionTable";
 
 const Transactions = () => {
-  const { currentUser } = useAuth(); // ✅ Correct source of truth
-  const { activePortfolio, setActivePortfolio } = usePortfolioContext(); // ✅ Global portfolio state
+  const { currentUser } = useAuth();
+  const { activePortfolio, setActivePortfolio } = usePortfolioContext();
 
-  // ✅ Hook will internally use currentUser or Firestore
   const {
     portfolios,
     setPortfolios,
@@ -1393,7 +1545,6 @@ const Transactions = () => {
   });
   const [newPortfolioName, setNewPortfolioName] = useState("");
 
-  // ✅ Keep activePortfolio synced with available portfolios
   useEffect(() => {
     if (
       activePortfolio &&
@@ -1404,7 +1555,6 @@ const Transactions = () => {
     }
   }, [portfolios, activePortfolio, setActivePortfolio]);
 
-  // ✅ Proper loading UI
   if (loading)
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-4rem)]">
@@ -1412,7 +1562,6 @@ const Transactions = () => {
       </div>
     );
 
-  // ✅ If still not logged in
   if (!currentUser)
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-4rem)] text-gray-700 text-lg bg-gray-100">
@@ -1420,7 +1569,6 @@ const Transactions = () => {
       </div>
     );
 
-  // ✅ Filter based on global activePortfolio
   const filteredTransactions = transactions.filter(
     (tx) => tx.portfolio === activePortfolio
   );
@@ -1443,8 +1591,8 @@ const Transactions = () => {
 
         <PortfolioManager
           portfolios={portfolios}
-          selectedPortfolio={activePortfolio}
-          setSelectedPortfolio={setActivePortfolio} // ✅ global setter
+          activePortfolio={activePortfolio}
+          setActivePortfolio={setActivePortfolio}
           newPortfolioName={newPortfolioName}
           setNewPortfolioName={setNewPortfolioName}
           handleAddPortfolio={() =>
@@ -1455,6 +1603,7 @@ const Transactions = () => {
               activePortfolio,
               syncToFirestore,
               setPortfolios,
+              setTransactions,
               setActivePortfolio,
               setNewPortfolioName
             )
