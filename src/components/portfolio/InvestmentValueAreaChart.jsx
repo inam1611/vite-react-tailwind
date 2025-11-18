@@ -480,14 +480,6 @@ const InvestmentValueAreaChart = ({ transactions, stockData, selectedPortfolio }
             fillOpacity={1}
             fill="url(#colorValue)"
           />
-          <Area
-            type="monotone"
-            dataKey="Avg Invested"
-            stroke="#f59e0b"
-            strokeWidth={2}
-            fillOpacity={0.2}
-            fill="url(#colorAvg)"
-          />
 
           {/* Line with points for Avg Invested */}
           <Line
@@ -505,3 +497,4 @@ const InvestmentValueAreaChart = ({ transactions, stockData, selectedPortfolio }
 };
 
 export default InvestmentValueAreaChart;
+
