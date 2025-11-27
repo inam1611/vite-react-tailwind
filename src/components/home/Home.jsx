@@ -1870,7 +1870,7 @@ const Home = () => {
   };
 
   return (
-    <div className="pt-14 px-3 sm:px-6 md:px-8 lg:px-12">
+    <div className="pt-14 px-4 sm:pl-20 md:pl-24 lg:pl-64 pr-4">
 
       {/* ===== Welcome ===== */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3 mb-6">
